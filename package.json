@@ -1,0 +1,15 @@
+{
+  "name": "ng-test",
+  "version": "0.0.1",
+  "description": "Client-A Dashboard",
+  "dependencies": {
+    "express": "latest",
+    "jade": "latest",
+    "socket.io": "latest"
+  },
+  "author": "bo",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0"
+  }
+}

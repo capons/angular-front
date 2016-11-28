@@ -1,0 +1,68 @@
+.nav-button {
+    width: 50%;
+    display: block;
+    float: left;
+    text-align: center;
+    padding: 20px;
+    background-color: black;
+    font-size: 30px;
+    border-bottom: 10px solid black;
+}
+.nav-button:hover {
+    background-color: rgba(80, 96, 109, 0.56);
+    border-bottom: 10px solid rgba(80, 96, 109, 0.56);
+}
+.ds-table {
+    display: table;
+    width: 100%;
+}
+.active {
+    background-color: rgba(80, 96, 109, 0.56);
+    border-bottom: 10px solid rgba(80, 96, 109, 0.56);
+}
+.has-error {
+    border: 1px solid red;
+}
+
+
+/*angular ng-reppeat animation*/
+.userpr {
+    opacity: 1;
+}
+.userpr.ng-enter {
+    -webkit-transition: 1s;
+    transition: 3s;
+    opacity: 0;
+}
+.userpr.ng-enter-active {
+    opacity: 1;
+}
+
+/*Loader nimation*/
+@keyframes flickerAnimation {
+    0%   { opacity:1; }
+    50%  { opacity:0; }
+    100% { opacity:1; }
+}
+@-o-keyframes flickerAnimation{
+    0%   { opacity:1; }
+    50%  { opacity:0; }
+    100% { opacity:1; }
+}
+@-moz-keyframes flickerAnimation{
+    0%   { opacity:1; }
+    50%  { opacity:0; }
+    100% { opacity:1; }
+}
+@-webkit-keyframes flickerAnimation{
+    0%   { opacity:1; }
+    50%  { opacity:0; }
+    100% { opacity:1; }
+}
+.animate-flicker {
+    -webkit-animation: flickerAnimation 1s infinite;
+    -moz-animation: flickerAnimation 1s infinite;
+    -o-animation: flickerAnimation 1s infinite;
+    animation: flickerAnimation 1s infinite;
+}
+
