@@ -27,7 +27,7 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
             });
     };
 
-    UserData.addUser = function (user) {
+    UserData.addUser = function (user){
         var param = $.param({
             data: user
         });
@@ -36,7 +36,20 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
             }
         };
-        return $http.post(apiUrl+'user/new', param, conf);
+        return $http.post(apiUrl+'user/', param, conf);
+    };
+    UserData.deleteUser = function (user_id){
+
+
+
+       // return $http.get(apiUrl+'user/delete/'+user_id);
+        return $http({
+            method: 'DELETE',
+            url: apiUrl+'user/'+user_id,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
     };
     return UserData;
 }]);

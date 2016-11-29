@@ -6,11 +6,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //ajax loader
     $scope.loading = true;
     //load service method getUser() -> factory UserService ->  object UserData
+
+
     getUser();
     function getUser() {
         UserData.getUser()
             .success(function (data, status, headers, config) {
-                console.log(data.body);
+                //console.log(data.body);
                 $scope.users = data.body;//angular.fromJson(responseData);
                 //  angular.forEach(data.data, function(item){
                 //  });
@@ -26,6 +28,28 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
             });
     }
+    var param = $.param({
+        data: '1'
+    });
+    var conf = {
+        headers : {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'Accept': 'application/json'
+        }
+    };
+
+    $scope.delete = function (user_id) {
+        $http.delete('/users/' + 1,param,conf)
+            .then(function (response) {
+                console.log(response.data);
+            }, function (rejection) {
+                console.log(rejection.data);
+            });
+    };
+
+
+
+
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
         $scope.$apply(function (scope) {
@@ -73,8 +97,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                                         console.log(config);
                                     });
                             }
-
-
                         })
                         .error(function (data, status, header, config) {
                             //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
@@ -87,6 +109,34 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             };
         }
     };
+
+
+
+    //delete user
+    /*
+    $scope.delete = function (user_id) {
+
+        deleteUser();
+        function deleteUser() {
+            UserData.deleteUser(user_id)
+                .success(function () {
+                    console.log('ok');
+                })
+                .error(function (data, status, header, config) {
+                    //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
+                    console.log(data);
+                    console.log(status);
+                    console.log(header);
+                    console.log(config);
+                });
+
+
+
+        }
+
+
+    };
+
 
 
 

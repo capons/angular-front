@@ -1,5 +1,5 @@
 //here need to add service and factory method
-var myApp = angular.module('app',['ngRoute','UserService','ngAnimate']);
+var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource']);
 
 //project const
 myApp.constant('apiUrl', 'http://symfony-api/');
@@ -22,6 +22,28 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 }]);
 
 
+myApp.directive('activeLink', ['$location', function (location) {
+    //create menu active links
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller) {
+            var clazz = attrs.activeLink;
+            var path = attrs.href;
+            scope.location = location;
+            scope.$watch('location.path()', function (newPath) {
+
+                if (path === newPath) {
+                    element.addClass(clazz);
+                } else {
+                    element.removeClass(clazz);
+                }
+            });
+        }
+    };
+}]);
+
+
+
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData) {
     //display all user
@@ -29,11 +51,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //ajax loader
     $scope.loading = true;
     //load service method getUser() -> factory UserService ->  object UserData
+
+
     getUser();
     function getUser() {
         UserData.getUser()
             .success(function (data, status, headers, config) {
-                console.log(data.body);
+                //console.log(data.body);
                 $scope.users = data.body;//angular.fromJson(responseData);
                 //  angular.forEach(data.data, function(item){
                 //  });
@@ -49,6 +73,28 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
             });
     }
+    var param = $.param({
+        data: '1'
+    });
+    var conf = {
+        headers : {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'Accept': 'application/json'
+        }
+    };
+
+    $scope.delete = function (user_id) {
+        $http.delete('/users/' + 1,param,conf)
+            .then(function (response) {
+                console.log(response.data);
+            }, function (rejection) {
+                console.log(rejection.data);
+            });
+    };
+
+
+
+
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
         $scope.$apply(function (scope) {
@@ -96,8 +142,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                                         console.log(config);
                                     });
                             }
-
-
                         })
                         .error(function (data, status, header, config) {
                             //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
@@ -110,6 +154,34 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             };
         }
     };
+
+
+
+    //delete user
+    /*
+    $scope.delete = function (user_id) {
+
+        deleteUser();
+        function deleteUser() {
+            UserData.deleteUser(user_id)
+                .success(function () {
+                    console.log('ok');
+                })
+                .error(function (data, status, header, config) {
+                    //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
+                    console.log(data);
+                    console.log(status);
+                    console.log(header);
+                    console.log(config);
+                });
+
+
+
+        }
+
+
+    };
+
 
 
 
@@ -371,28 +443,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         init();
         */
     }]);
-myApp.directive('loading',   ['$http' ,function ($http)
-{
-    return {
-        restrict: 'A',
-        link: function (scope, elm, attrs)
-        {
-            scope.isLoading = function () {
-                return $http.pendingRequests.length > 0;
-            };
 
-            scope.$watch(scope.isLoading, function (v)
-            {
-                if(v){
-                    elm.show();
-                }else{
-                    elm.hide();
-                }
-            });
-        }
-    };
-
-}]);
 
 var UserService = angular.module('UserService', []);
 //app.module -> all constant
@@ -423,7 +474,7 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
             });
     };
 
-    UserData.addUser = function (user) {
+    UserData.addUser = function (user){
         var param = $.param({
             data: user
         });
@@ -432,7 +483,20 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
             }
         };
-        return $http.post(apiUrl+'user/new', param, conf);
+        return $http.post(apiUrl+'user/', param, conf);
+    };
+    UserData.deleteUser = function (user_id){
+
+
+
+       // return $http.get(apiUrl+'user/delete/'+user_id);
+        return $http({
+            method: 'DELETE',
+            url: apiUrl+'user/'+user_id,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
     };
     return UserData;
 }]);
@@ -444,25 +508,3 @@ myApp.controller('saleController', ['$scope', '$interval', '$location', function
 /**
  * Created by User on 11/11/2016.
  */
-
-
-myApp.directive('activeLink', ['$location', function (location) {
-    //create menu active links
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-            var clazz = attrs.activeLink;
-            var path = attrs.href;
-            scope.location = location;
-            scope.$watch('location.path()', function (newPath) {
-
-                if (path === newPath) {
-                    element.addClass(clazz);
-                } else {
-                    element.removeClass(clazz);
-                }
-            });
-        }
-    };
-}]);
-
