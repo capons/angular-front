@@ -2,4 +2,4 @@
 var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource']);
 
 //project const
-myApp.constant('apiUrl', 'http://symfony-api/');
+myApp.constant('apiUrl', 'http://api/');

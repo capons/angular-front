@@ -4,7 +4,13 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
 
     var UserData = {};
     UserData.getUser = function () {
-        return $http.get(apiUrl+'user');
+        return $http.get(apiUrl+'users',{
+            header: {
+                'Access-Control-Allow-origin': '*',
+                'Content-Type': 'application/json'
+
+            }
+        });
     };
 
     UserData.uploadPhoto = function (files,master,user){
@@ -36,7 +42,7 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
             }
         };
-        return $http.post(apiUrl+'user/', param, conf);
+        return $http.post(apiUrl+'users', param, conf);
     };
     UserData.deleteUser = function (user_id){
 

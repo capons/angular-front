@@ -2,7 +2,7 @@
 var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource']);
 
 //project const
-myApp.constant('apiUrl', 'http://symfony-api/');
+myApp.constant('apiUrl', 'http://api/');
 
 //app routes
 myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$locationProvider) {
@@ -22,28 +22,6 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 }]);
 
 
-myApp.directive('activeLink', ['$location', function (location) {
-    //create menu active links
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-            var clazz = attrs.activeLink;
-            var path = attrs.href;
-            scope.location = location;
-            scope.$watch('location.path()', function (newPath) {
-
-                if (path === newPath) {
-                    element.addClass(clazz);
-                } else {
-                    element.removeClass(clazz);
-                }
-            });
-        }
-    };
-}]);
-
-
-
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData) {
     //display all user
@@ -58,7 +36,8 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         UserData.getUser()
             .success(function (data, status, headers, config) {
                 //console.log(data.body);
-                $scope.users = data.body;//angular.fromJson(responseData);
+                console.log(data);
+                $scope.users = data;//angular.fromJson(responseData);
                 //  angular.forEach(data.data, function(item){
                 //  });
                 //ajax loader off
@@ -131,7 +110,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                                 UserData.addUser($scope.master)
                                     .success(function (data, status, headers, config) {
                                         //add new user to scope -> to see changes
-                                        $scope.users.push(data.body);
+                                        $scope.users.push(data);
                                         //upload photo
                                     })
                                     .error(function (data, status, header, config) {
@@ -451,7 +430,13 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
 
     var UserData = {};
     UserData.getUser = function () {
-        return $http.get(apiUrl+'user');
+        return $http.get(apiUrl+'users',{
+            header: {
+                'Access-Control-Allow-origin': '*',
+                'Content-Type': 'application/json'
+
+            }
+        });
     };
 
     UserData.uploadPhoto = function (files,master,user){
@@ -483,7 +468,7 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
             }
         };
-        return $http.post(apiUrl+'user/', param, conf);
+        return $http.post(apiUrl+'users', param, conf);
     };
     UserData.deleteUser = function (user_id){
 
@@ -508,3 +493,25 @@ myApp.controller('saleController', ['$scope', '$interval', '$location', function
 /**
  * Created by User on 11/11/2016.
  */
+
+
+myApp.directive('activeLink', ['$location', function (location) {
+    //create menu active links
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller) {
+            var clazz = attrs.activeLink;
+            var path = attrs.href;
+            scope.location = location;
+            scope.$watch('location.path()', function (newPath) {
+
+                if (path === newPath) {
+                    element.addClass(clazz);
+                } else {
+                    element.removeClass(clazz);
+                }
+            });
+        }
+    };
+}]);
+

@@ -13,7 +13,8 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         UserData.getUser()
             .success(function (data, status, headers, config) {
                 //console.log(data.body);
-                $scope.users = data.body;//angular.fromJson(responseData);
+                console.log(data);
+                $scope.users = data;//angular.fromJson(responseData);
                 //  angular.forEach(data.data, function(item){
                 //  });
                 //ajax loader off
@@ -86,7 +87,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                                 UserData.addUser($scope.master)
                                     .success(function (data, status, headers, config) {
                                         //add new user to scope -> to see changes
-                                        $scope.users.push(data.body);
+                                        $scope.users.push(data);
                                         //upload photo
                                     })
                                     .error(function (data, status, header, config) {
