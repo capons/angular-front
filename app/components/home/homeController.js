@@ -1,52 +1,37 @@
 
 
-myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData) {
+myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
     //display all user
+
+
+
+
     $scope.users = [];
     //ajax loader
     $scope.loading = true;
     //load service method getUser() -> factory UserService ->  object UserData
+    UsersService.get()
+        .success(function (data, status, headers, config) {
+            //console.log(data.body);
+            console.log(data);
+            $scope.users = data;//angular.fromJson(responseData);
+            //  angular.forEach(data.data, function(item){
+            //  });
+            //ajax loader off
+            $scope.loading = false;
+        })
+        .error(function (data, status, header, config) {
+            console.log(data);
+            console.log(status);
+            console.log(header);
+            console.log(config);
+
+        });
 
 
-    getUser();
-    function getUser() {
-        UserData.getUser()
-            .success(function (data, status, headers, config) {
-                //console.log(data.body);
-                console.log(data);
-                $scope.users = data;//angular.fromJson(responseData);
-                //  angular.forEach(data.data, function(item){
-                //  });
-                //ajax loader off
-                $scope.loading = false;
-            })
 
-            .error(function (data, status, header, config) {
-                console.log(data);
-                console.log(status);
-                console.log(header);
-                console.log(config);
 
-            });
-    }
-    var param = $.param({
-        data: '1'
-    });
-    var conf = {
-        headers : {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-            'Accept': 'application/json'
-        }
-    };
 
-    $scope.delete = function (user_id) {
-        $http.delete('/users/' + 1,param,conf)
-            .then(function (response) {
-                console.log(response.data);
-            }, function (rejection) {
-                console.log(rejection.data);
-            });
-    };
 
 
 
@@ -114,14 +99,14 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
     //delete user
-    /*
-    $scope.delete = function (user_id) {
-
+    $scope.delete = function (user_id,item) {
         deleteUser();
         function deleteUser() {
             UserData.deleteUser(user_id)
-                .success(function () {
-                    console.log('ok');
+                .success(function (data) {
+                    //remove element from users scope
+                    var index = $scope.users.indexOf(item);
+                    $scope.users.splice(index, 1);
                 })
                 .error(function (data, status, header, config) {
                     //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
@@ -130,8 +115,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                     console.log(header);
                     console.log(config);
                 });
-
-
 
         }
 

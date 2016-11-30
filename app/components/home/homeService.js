@@ -1,61 +1,20 @@
-var UserService = angular.module('UserService', []);
-//app.module -> all constant
-UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
 
-    var UserData = {};
-    UserData.getUser = function () {
+
+
+
+//service example
+myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
+    //to create unique contact id
+
+
+    //save method create a new contact if not already exists
+    //else update the existing object
+    this.get = function () {
         return $http.get(apiUrl+'users',{
             header: {
                 'Access-Control-Allow-origin': '*',
                 'Content-Type': 'application/json'
-
             }
         });
     };
-
-    UserData.uploadPhoto = function (files,master,user){
-        var fd = new FormData();
-        for (var i in files) {
-            //get file name to send in API server
-            fd.append("uploadedFile", files[i])
-        }
-        //upload user photo
-
-        return $http.post("photo.php", fd, {
-                withCredentials: false,
-                headers: {
-                    'Content-Type': undefined
-                },
-                transformRequest: angular.identity,
-                params: {
-                    fd: fd
-                }
-            });
-    };
-
-    UserData.addUser = function (user){
-        var param = $.param({
-            data: user
-        });
-        var conf = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-            }
-        };
-        return $http.post(apiUrl+'users', param, conf);
-    };
-    UserData.deleteUser = function (user_id){
-
-
-
-       // return $http.get(apiUrl+'user/delete/'+user_id);
-        return $http({
-            method: 'DELETE',
-            url: apiUrl+'user/'+user_id,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-    };
-    return UserData;
 }]);

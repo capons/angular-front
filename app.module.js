@@ -23,53 +23,38 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 
 
 
-myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData) {
+myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
     //display all user
+
+
+
+
     $scope.users = [];
     //ajax loader
     $scope.loading = true;
     //load service method getUser() -> factory UserService ->  object UserData
+    UsersService.get()
+        .success(function (data, status, headers, config) {
+            //console.log(data.body);
+            console.log(data);
+            $scope.users = data;//angular.fromJson(responseData);
+            //  angular.forEach(data.data, function(item){
+            //  });
+            //ajax loader off
+            $scope.loading = false;
+        })
+        .error(function (data, status, header, config) {
+            console.log(data);
+            console.log(status);
+            console.log(header);
+            console.log(config);
+
+        });
 
 
-    getUser();
-    function getUser() {
-        UserData.getUser()
-            .success(function (data, status, headers, config) {
-                //console.log(data.body);
-                console.log(data);
-                $scope.users = data;//angular.fromJson(responseData);
-                //  angular.forEach(data.data, function(item){
-                //  });
-                //ajax loader off
-                $scope.loading = false;
-            })
 
-            .error(function (data, status, header, config) {
-                console.log(data);
-                console.log(status);
-                console.log(header);
-                console.log(config);
 
-            });
-    }
-    var param = $.param({
-        data: '1'
-    });
-    var conf = {
-        headers : {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-            'Accept': 'application/json'
-        }
-    };
 
-    $scope.delete = function (user_id) {
-        $http.delete('/users/' + 1,param,conf)
-            .then(function (response) {
-                console.log(response.data);
-            }, function (rejection) {
-                console.log(rejection.data);
-            });
-    };
 
 
 
@@ -137,14 +122,14 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
     //delete user
-    /*
-    $scope.delete = function (user_id) {
-
+    $scope.delete = function (user_id,item) {
         deleteUser();
         function deleteUser() {
             UserData.deleteUser(user_id)
-                .success(function () {
-                    console.log('ok');
+                .success(function (data) {
+                    //remove element from users scope
+                    var index = $scope.users.indexOf(item);
+                    $scope.users.splice(index, 1);
                 })
                 .error(function (data, status, header, config) {
                     //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
@@ -153,8 +138,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                     console.log(header);
                     console.log(config);
                 });
-
-
 
         }
 
@@ -423,12 +406,12 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         */
     }]);
 
-
 var UserService = angular.module('UserService', []);
 //app.module -> all constant
 UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
 
     var UserData = {};
+    /* this methid remove to service
     UserData.getUser = function () {
         return $http.get(apiUrl+'users',{
             header: {
@@ -438,6 +421,7 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
             }
         });
     };
+    */
 
     UserData.uploadPhoto = function (files,master,user){
         var fd = new FormData();
@@ -448,15 +432,15 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
         //upload user photo
 
         return $http.post("photo.php", fd, {
-                withCredentials: false,
-                headers: {
-                    'Content-Type': undefined
-                },
-                transformRequest: angular.identity,
-                params: {
-                    fd: fd
-                }
-            });
+            withCredentials: false,
+            headers: {
+                'Content-Type': undefined
+            },
+            transformRequest: angular.identity,
+            params: {
+                fd: fd
+            }
+        });
     };
 
     UserData.addUser = function (user){
@@ -472,19 +456,34 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
     };
     UserData.deleteUser = function (user_id){
 
-
-
-       // return $http.get(apiUrl+'user/delete/'+user_id);
-        return $http({
-            method: 'DELETE',
-            url: apiUrl+'user/'+user_id,
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        return  $http({
+            method : "GET",
+            url : apiUrl+'users/'+user_id+"/remove"
         })
     };
     return UserData;
 }]);
+
+
+
+
+//service example
+myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
+    //to create unique contact id
+
+
+    //save method create a new contact if not already exists
+    //else update the existing object
+    this.get = function () {
+        return $http.get(apiUrl+'users',{
+            header: {
+                'Access-Control-Allow-origin': '*',
+                'Content-Type': 'application/json'
+            }
+        });
+    };
+}]);
+
 
 
 myApp.controller('saleController', ['$scope', '$interval', '$location', function ($scope, $interval, $location) {
