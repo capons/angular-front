@@ -1,5 +1,5 @@
 //here need to add service and factory method
-var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource']);
+var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource','ui.bootstrap']);
 
 //project const
 myApp.constant('apiUrl', 'http://api/');
@@ -22,10 +22,31 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 }]);
 
 
+myApp.directive('activeLink', ['$location', function (location) {
+    //create menu active links
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller) {
+            var clazz = attrs.activeLink;
+            var path = attrs.href;
+            scope.location = location;
+            scope.$watch('location.path()', function (newPath) {
+
+                if (path === newPath) {
+                    element.addClass(clazz);
+                } else {
+                    element.removeClass(clazz);
+                }
+            });
+        }
+    };
+}]);
+
+
+
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
     //display all user
-
 
 
 
@@ -42,6 +63,10 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             //  });
             //ajax loader off
             $scope.loading = false;
+
+
+
+
         })
         .error(function (data, status, header, config) {
             console.log(data);
@@ -50,11 +75,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             console.log(config);
 
         });
-
-
-
-
-
 
 
 
@@ -143,6 +163,9 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
     };
+
+
+
 
 
 
@@ -492,25 +515,3 @@ myApp.controller('saleController', ['$scope', '$interval', '$location', function
 /**
  * Created by User on 11/11/2016.
  */
-
-
-myApp.directive('activeLink', ['$location', function (location) {
-    //create menu active links
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-            var clazz = attrs.activeLink;
-            var path = attrs.href;
-            scope.location = location;
-            scope.$watch('location.path()', function (newPath) {
-
-                if (path === newPath) {
-                    element.addClass(clazz);
-                } else {
-                    element.removeClass(clazz);
-                }
-            });
-        }
-    };
-}]);
-

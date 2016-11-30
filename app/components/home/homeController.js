@@ -5,7 +5,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
 
-
     $scope.users = [];
     //ajax loader
     $scope.loading = true;
@@ -19,6 +18,10 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             //  });
             //ajax loader off
             $scope.loading = false;
+
+
+
+
         })
         .error(function (data, status, header, config) {
             console.log(data);
@@ -27,11 +30,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             console.log(config);
 
         });
-
-
-
-
-
 
 
 
@@ -120,6 +118,9 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
     };
+
+
+
 
 
 
