@@ -4,6 +4,19 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //display all user
 
 
+  
+
+
+
+
+
+
+
+
+
+
+
+
 
     $scope.users = [];
     //ajax loader
@@ -19,15 +32,12 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             //ajax loader off
             $scope.loading = false;
 
-
-
-
         })
         .error(function (data, status, header, config) {
-            console.log(data);
+
             console.log(status);
             console.log(header);
-            console.log(config);
+
 
         });
 

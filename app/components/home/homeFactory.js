@@ -49,8 +49,9 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
     UserData.deleteUser = function (user_id){
 
         return  $http({
-            method : "GET",
-            url : apiUrl+'users/'+user_id+"/remove"
+            method : "DELETE",
+            //url : apiUrl+'users/'+user_id+"/remove"
+            url : apiUrl+'users/'+user_id
         })
     };
     return UserData;

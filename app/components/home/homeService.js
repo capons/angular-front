@@ -10,11 +10,14 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
     //save method create a new contact if not already exists
     //else update the existing object
     this.get = function () {
+
         return $http.get(apiUrl+'users',{
             header: {
-                'Access-Control-Allow-origin': '*',
-                'Content-Type': 'application/json'
+       //         'Access-Control-Allow-origin': '*',
+       //         'Content-Type': 'application/json'
             }
         });
+
+
     };
 }]);

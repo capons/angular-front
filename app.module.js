@@ -22,31 +22,22 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 }]);
 
 
-myApp.directive('activeLink', ['$location', function (location) {
-    //create menu active links
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-            var clazz = attrs.activeLink;
-            var path = attrs.href;
-            scope.location = location;
-            scope.$watch('location.path()', function (newPath) {
-
-                if (path === newPath) {
-                    element.addClass(clazz);
-                } else {
-                    element.removeClass(clazz);
-                }
-            });
-        }
-    };
-}]);
-
-
-
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
     //display all user
+
+
+  
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -64,15 +55,12 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             //ajax loader off
             $scope.loading = false;
 
-
-
-
         })
         .error(function (data, status, header, config) {
-            console.log(data);
+
             console.log(status);
             console.log(header);
-            console.log(config);
+
 
         });
 
@@ -480,8 +468,9 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
     UserData.deleteUser = function (user_id){
 
         return  $http({
-            method : "GET",
-            url : apiUrl+'users/'+user_id+"/remove"
+            method : "DELETE",
+            //url : apiUrl+'users/'+user_id+"/remove"
+            url : apiUrl+'users/'+user_id
         })
     };
     return UserData;
@@ -498,12 +487,15 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
     //save method create a new contact if not already exists
     //else update the existing object
     this.get = function () {
+
         return $http.get(apiUrl+'users',{
             header: {
-                'Access-Control-Allow-origin': '*',
-                'Content-Type': 'application/json'
+       //         'Access-Control-Allow-origin': '*',
+       //         'Content-Type': 'application/json'
             }
         });
+
+
     };
 }]);
 
@@ -515,3 +507,25 @@ myApp.controller('saleController', ['$scope', '$interval', '$location', function
 /**
  * Created by User on 11/11/2016.
  */
+
+
+myApp.directive('activeLink', ['$location', function (location) {
+    //create menu active links
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller) {
+            var clazz = attrs.activeLink;
+            var path = attrs.href;
+            scope.location = location;
+            scope.$watch('location.path()', function (newPath) {
+
+                if (path === newPath) {
+                    element.addClass(clazz);
+                } else {
+                    element.removeClass(clazz);
+                }
+            });
+        }
+    };
+}]);
+
