@@ -1,7 +1,6 @@
 var UserService = angular.module('UserService', []);
 //app.module -> all constant
 UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
-
     var UserData = {};
     /* this methid remove to service
     UserData.getUser = function () {
@@ -14,7 +13,6 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
         });
     };
     */
-
     UserData.uploadPhoto = function (files,master,user){
         var fd = new FormData();
         for (var i in files) {
@@ -34,7 +32,6 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
             }
         });
     };
-
     UserData.addUser = function (user){
         var param = $.param({
             data: user

@@ -1,23 +1,9 @@
 
 
-myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
+myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
+
+
     //display all user
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
     $scope.users = [];
     //ajax loader
     $scope.loading = true;
@@ -25,12 +11,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     UsersService.get()
         .success(function (data, status, headers, config) {
             //console.log(data.body);
-            console.log(data);
+           // console.log(data);
             $scope.users = data;//angular.fromJson(responseData);
             //  angular.forEach(data.data, function(item){
             //  });
             //ajax loader off
             $scope.loading = false;
+
 
         })
         .error(function (data, status, header, config) {
@@ -40,6 +27,23 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
         });
+
+
+    //pagination users data
+    $scope.currentPage = 0;
+    $scope.pageSize = 4;
+    $scope.data = [];
+    $scope.numberOfPages=function(){
+        return Math.ceil($scope.users.length/$scope.pageSize);
+    };
+
+    //some click loader function display animation
+    $scope.loader = function(){
+        $scope.loading = true;
+        $timeout(function () {
+            $scope.loading = false;
+        }, 1000);
+    };
 
 
 

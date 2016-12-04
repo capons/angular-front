@@ -1,7 +1,4 @@
 
-
-
-
 //service example
 myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
     //to create unique contact id

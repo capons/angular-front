@@ -1,8 +1,15 @@
+
+
+
+
+
 //here need to add service and factory method
-var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource','ui.bootstrap']);
+var myApp = angular.module('app',['ngRoute','UserService','ngAnimate','ngResource']);
 
 //project const
 myApp.constant('apiUrl', 'http://api/');
+
+
 
 //app routes
 myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$locationProvider) {
@@ -23,24 +30,11 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 
 
 
-myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
+
+myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
+
+
     //display all user
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
     $scope.users = [];
     //ajax loader
     $scope.loading = true;
@@ -48,12 +42,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     UsersService.get()
         .success(function (data, status, headers, config) {
             //console.log(data.body);
-            console.log(data);
+           // console.log(data);
             $scope.users = data;//angular.fromJson(responseData);
             //  angular.forEach(data.data, function(item){
             //  });
             //ajax loader off
             $scope.loading = false;
+
 
         })
         .error(function (data, status, header, config) {
@@ -63,6 +58,23 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 
         });
+
+
+    //pagination users data
+    $scope.currentPage = 0;
+    $scope.pageSize = 4;
+    $scope.data = [];
+    $scope.numberOfPages=function(){
+        return Math.ceil($scope.users.length/$scope.pageSize);
+    };
+
+    //some click loader function display animation
+    $scope.loader = function(){
+        $scope.loading = true;
+        $timeout(function () {
+            $scope.loading = false;
+        }, 1000);
+    };
 
 
 
@@ -420,7 +432,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 var UserService = angular.module('UserService', []);
 //app.module -> all constant
 UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
-
     var UserData = {};
     /* this methid remove to service
     UserData.getUser = function () {
@@ -433,7 +444,6 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
         });
     };
     */
-
     UserData.uploadPhoto = function (files,master,user){
         var fd = new FormData();
         for (var i in files) {
@@ -453,7 +463,6 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
             }
         });
     };
-
     UserData.addUser = function (user){
         var param = $.param({
             data: user
@@ -475,6 +484,13 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
     };
     return UserData;
 }]);
+//pagination filter
+myApp.filter('startFrom', function() {
+    return function(input, start) {
+        start = +start; //parse to int
+        return input.slice(start);
+    }
+});
 
 
 
