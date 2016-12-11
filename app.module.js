@@ -28,7 +28,41 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
 
 }]);
 
-
+//service example
+myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
+    //to create unique contact id
+    //save method create a new contact if not already exists
+    //else update the existing object
+    this.get = function (url,params) {
+        //set up default parameter if do not need
+        if(params == 'undefined'){
+            params = '';
+        }
+        return $http({
+            "url": apiUrl+'users',
+            "method": 'GET',
+            "params": params
+            //  "cache": true
+        });
+    };
+    this.post = function(param) {
+        var param = $.param({
+            data: param
+        });
+        var conf = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        return $http.post(apiUrl+'users', param, conf);
+    };
+    this.delete = function (user_id) {
+        return  $http({
+            method : "DELETE",
+            url : apiUrl+'users/'+user_id
+        })
+    }
+}]);
 
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
@@ -39,7 +73,9 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //ajax loader
     $scope.loading = true;
     //load service method getUser() -> factory UserService ->  object UserData
-    UsersService.get()
+   // $scope.users = UsersService.get();
+
+    UsersService.get('users')
         .success(function (data, status, headers, config) {
             //console.log(data.body);
            // console.log(data);
@@ -48,26 +84,21 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             //  });
             //ajax loader off
             $scope.loading = false;
-
-
         })
         .error(function (data, status, header, config) {
-
             console.log(status);
             console.log(header);
-
-
         });
 
 
-    //pagination users data
+    //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
+    //number of item in one page
     $scope.pageSize = 4;
-    $scope.data = [];
+   // $scope.data = [];
     $scope.numberOfPages=function(){
         return Math.ceil($scope.users.length/$scope.pageSize);
     };
-
     //some click loader function display animation
     $scope.loader = function(){
         $scope.loading = true;
@@ -75,9 +106,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             $scope.loading = false;
         }, 1000);
     };
-
-
-
 
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
@@ -101,31 +129,22 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                 function uploadPhoto() {
                     UserData.uploadPhoto($scope.files,$scope.master,user)
                         .success(function (data, status, headers, config) {
-
                             //add new user to scope -> to see changes
-
                             $scope.master = angular.copy(user);
                             //add file upload path to user data
                             $scope.master['file_path'] = data;
                             console.log($scope.master);
-                            //load addUser service
-
-                            addUser();
-                            function addUser() {
-                                UserData.addUser($scope.master)
-                                    .success(function (data, status, headers, config) {
-                                        //add new user to scope -> to see changes
-                                        $scope.users.push(data);
-                                        //upload photo
-                                    })
-                                    .error(function (data, status, header, config) {
-                                        //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                                        console.log(data);
-                                        console.log(status);
-                                        console.log(header);
-                                        console.log(config);
-                                    });
-                            }
+                           //add user
+                            UsersService.post($scope.master)
+                                .success(function (data, status, headers, config) {
+                                    //add user data to scope
+                                    //add element to first scope index
+                                    $scope.users.unshift(data);
+                                })
+                                .error(function (data, status, header, config) {
+                                    console.log(status);
+                                    console.log(header);
+                                });
                         })
                         .error(function (data, status, header, config) {
                             //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
@@ -143,24 +162,19 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     //delete user
     $scope.delete = function (user_id,item) {
-        deleteUser();
-        function deleteUser() {
-            UserData.deleteUser(user_id)
-                .success(function (data) {
-                    //remove element from users scope
-                    var index = $scope.users.indexOf(item);
-                    $scope.users.splice(index, 1);
-                })
-                .error(function (data, status, header, config) {
-                    //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                    console.log(data);
-                    console.log(status);
-                    console.log(header);
-                    console.log(config);
-                });
-
-        }
-
+        UsersService.delete(user_id,item)
+            .success(function (data) {
+                //remove element from users scope
+                var index = $scope.users.indexOf(item);
+                $scope.users.splice(index, 1);
+            })
+            .error(function (data, status, header, config) {
+                //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
+                console.log(data);
+                console.log(status);
+                console.log(header);
+                console.log(config);
+            });
 
     };
 
@@ -432,18 +446,9 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 var UserService = angular.module('UserService', []);
 //app.module -> all constant
 UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
+    //object return with service
     var UserData = {};
-    /* this methid remove to service
-    UserData.getUser = function () {
-        return $http.get(apiUrl+'users',{
-            header: {
-                'Access-Control-Allow-origin': '*',
-                'Content-Type': 'application/json'
-
-            }
-        });
-    };
-    */
+    //upload user photo
     UserData.uploadPhoto = function (files,master,user){
         var fd = new FormData();
         for (var i in files) {
@@ -463,25 +468,6 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
             }
         });
     };
-    UserData.addUser = function (user){
-        var param = $.param({
-            data: user
-        });
-        var conf = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-            }
-        };
-        return $http.post(apiUrl+'users', param, conf);
-    };
-    UserData.deleteUser = function (user_id){
-
-        return  $http({
-            method : "DELETE",
-            //url : apiUrl+'users/'+user_id+"/remove"
-            url : apiUrl+'users/'+user_id
-        })
-    };
     return UserData;
 }]);
 //pagination filter
@@ -493,27 +479,6 @@ myApp.filter('startFrom', function() {
 });
 
 
-
-
-//service example
-myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
-    //to create unique contact id
-
-
-    //save method create a new contact if not already exists
-    //else update the existing object
-    this.get = function () {
-
-        return $http.get(apiUrl+'users',{
-            header: {
-       //         'Access-Control-Allow-origin': '*',
-       //         'Content-Type': 'application/json'
-            }
-        });
-
-
-    };
-}]);
 
 
 

@@ -8,7 +8,9 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //ajax loader
     $scope.loading = true;
     //load service method getUser() -> factory UserService ->  object UserData
-    UsersService.get()
+   // $scope.users = UsersService.get();
+
+    UsersService.get('users')
         .success(function (data, status, headers, config) {
             //console.log(data.body);
            // console.log(data);
@@ -17,26 +19,21 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             //  });
             //ajax loader off
             $scope.loading = false;
-
-
         })
         .error(function (data, status, header, config) {
-
             console.log(status);
             console.log(header);
-
-
         });
 
 
-    //pagination users data
+    //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
+    //number of item in one page
     $scope.pageSize = 4;
-    $scope.data = [];
+   // $scope.data = [];
     $scope.numberOfPages=function(){
         return Math.ceil($scope.users.length/$scope.pageSize);
     };
-
     //some click loader function display animation
     $scope.loader = function(){
         $scope.loading = true;
@@ -44,9 +41,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             $scope.loading = false;
         }, 1000);
     };
-
-
-
 
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
@@ -70,31 +64,22 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                 function uploadPhoto() {
                     UserData.uploadPhoto($scope.files,$scope.master,user)
                         .success(function (data, status, headers, config) {
-
                             //add new user to scope -> to see changes
-
                             $scope.master = angular.copy(user);
                             //add file upload path to user data
                             $scope.master['file_path'] = data;
                             console.log($scope.master);
-                            //load addUser service
-
-                            addUser();
-                            function addUser() {
-                                UserData.addUser($scope.master)
-                                    .success(function (data, status, headers, config) {
-                                        //add new user to scope -> to see changes
-                                        $scope.users.push(data);
-                                        //upload photo
-                                    })
-                                    .error(function (data, status, header, config) {
-                                        //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                                        console.log(data);
-                                        console.log(status);
-                                        console.log(header);
-                                        console.log(config);
-                                    });
-                            }
+                           //add user
+                            UsersService.post($scope.master)
+                                .success(function (data, status, headers, config) {
+                                    //add user data to scope
+                                    //add element to first scope index
+                                    $scope.users.unshift(data);
+                                })
+                                .error(function (data, status, header, config) {
+                                    console.log(status);
+                                    console.log(header);
+                                });
                         })
                         .error(function (data, status, header, config) {
                             //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
@@ -112,24 +97,19 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     //delete user
     $scope.delete = function (user_id,item) {
-        deleteUser();
-        function deleteUser() {
-            UserData.deleteUser(user_id)
-                .success(function (data) {
-                    //remove element from users scope
-                    var index = $scope.users.indexOf(item);
-                    $scope.users.splice(index, 1);
-                })
-                .error(function (data, status, header, config) {
-                    //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                    console.log(data);
-                    console.log(status);
-                    console.log(header);
-                    console.log(config);
-                });
-
-        }
-
+        UsersService.delete(user_id,item)
+            .success(function (data) {
+                //remove element from users scope
+                var index = $scope.users.indexOf(item);
+                $scope.users.splice(index, 1);
+            })
+            .error(function (data, status, header, config) {
+                //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
+                console.log(data);
+                console.log(status);
+                console.log(header);
+                console.log(config);
+            });
 
     };
 
