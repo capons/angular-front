@@ -10,11 +10,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //load service method getUser() -> factory UserService ->  object UserData
    // $scope.users = UsersService.get();
 
+
     UsersService.get('users')
         .success(function (data, status, headers, config) {
+            console.log(data);
             //console.log(data.body);
            // console.log(data);
-            $scope.users = data;//angular.fromJson(responseData);
+            $scope.users = data.body;//angular.fromJson(responseData);
             //  angular.forEach(data.data, function(item){
             //  });
             //ajax loader off
@@ -26,6 +28,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         });
 
 
+
     //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
     //number of item in one page
@@ -34,13 +37,17 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     $scope.numberOfPages=function(){
         return Math.ceil($scope.users.length/$scope.pageSize);
     };
+
     //some click loader function display animation
+
     $scope.loader = function(){
         $scope.loading = true;
         $timeout(function () {
             $scope.loading = false;
-        }, 1000);
+        }, 500);
     };
+
+
 
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
@@ -72,11 +79,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                            //add user
                             UsersService.post($scope.master)
                                 .success(function (data, status, headers, config) {
+                                    console.log(data);
                                     //add user data to scope
                                     //add element to first scope index
-                                    $scope.users.unshift(data);
+                                    $scope.users.unshift(data.body);
                                 })
                                 .error(function (data, status, header, config) {
+                                    console.log(data);
                                     console.log(status);
                                     console.log(header);
                                 });
@@ -102,13 +111,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                 //remove element from users scope
                 var index = $scope.users.indexOf(item);
                 $scope.users.splice(index, 1);
+              //  console.log(data);
             })
             .error(function (data, status, header, config) {
-                //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                console.log(data);
-                console.log(status);
-                console.log(header);
-                console.log(config);
+              //  console.log(data);
+              //  console.log(status);
+              //  console.log(header);
+              //  console.log(config);
             });
 
     };

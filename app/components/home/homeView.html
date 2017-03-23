@@ -1,8 +1,5 @@
 <div  class="container-fluid">
-    <!--ajax loader -->
-    <div ng-show="loading" style="position: fixed;left:0px;top:100px;height: 100%;width: 100%;background-color: white;z-index: 1000">
-        <div class="animate-flicker" style="position: absolute;top:40%;left:50%;margin-left: -50px;z-index: 500;width: 100px;" >Loading...</div>
-    </div>
+
     <h1 style="text-align: center">User registration form!!</h1>
     <div class="row">
         <div style="float: none;margin: 0 auto" class="col-lg-4">
@@ -69,8 +66,12 @@
 
     </div>
 
-    <div id="users-container" class="col-xs-12 example-animate-container">
-        <div  style="margin-bottom: 20px" ng-repeat="user in users | filter: searchUser | startFrom:currentPage*pageSize | limitTo:pageSize " class="col-xs-3 img-thumbnail userAnime">
+    <div id="users-container" style="min-height: 200px;position: relative;max-height: 200px;overflow: hidden !important;" class="col-xs-12 example-animate-container">
+        <!--ajax loader -->
+        <div ng-show="loading" style="position: absolute;left:0px;top:0px;height: 100%;min-height: 200px;width: 100%;background-color: white;z-index: 1000">
+            <div class="animate-flicker" style="position: absolute;top:40%;left:50%;margin-left: -50px;z-index: 500;width: 100px;" >Loading...</div>
+        </div>
+        <div   style="margin-bottom: 20px" ng-repeat="user in users | filter: searchUser | startFrom:currentPage*pageSize | limitTo:pageSize " class="col-xs-3 img-thumbnail users-anime">
             <div  style="padding: 10px" class="col-xs-12">
                 <div class="col-xs-12">
                     <p>

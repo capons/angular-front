@@ -9,9 +9,10 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             params = '';
         }
         return $http({
-            "url": apiUrl+'users',
+            "url": apiUrl+url,//'users'
             "method": 'GET',
-            "params": params
+
+            headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
             //  "cache": true
         });
     };
@@ -27,9 +28,11 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
         return $http.post(apiUrl+'users', param, conf);
     };
     this.delete = function (user_id) {
-        return  $http({
-            method : "DELETE",
-            url : apiUrl+'users/'+user_id
-        })
+        var conf = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        return  $http.delete(apiUrl+'users/'+user_id, param = null, conf)
     }
 }]);

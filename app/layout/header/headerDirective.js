@@ -8,7 +8,6 @@ myApp.directive('activeLink', ['$location', function (location) {
             var path = attrs.href;
             scope.location = location;
             scope.$watch('location.path()', function (newPath) {
-
                 if (path === newPath) {
                     element.addClass(clazz);
                 } else {

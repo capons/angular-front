@@ -46,6 +46,77 @@
 
 
 
+
+
+
+
+
+
+
+/*Add delete user animation*/
+.users-anime.ng-enter  {
+    -webkit-animation:1.5s anim_enter;
+    -moz-animation:1.5s anim_enter;
+    -o-animation:1.5s anim_enter;
+    animation:1.5s anim_enter;
+    position:relative;
+}
+@keyframes anim_enter {
+    from {
+        left:100%;
+    }
+    to {
+        left:0;
+    }
+}
+
+@-webkit-keyframes anim_enter {
+    from {
+        left:100%;
+    }
+    to {
+        left:0;
+    }
+}
+
+.users-anime.ng-leave{
+    -webkit-animation:1.5s anim_leave;
+    -moz-animation:1.5s anim_leave;
+    -o-animation:1.5s anim_leave;
+    animation:1.5s anim_leave;
+    position:relative;
+}
+
+@keyframes anim_leave {
+    from {
+        left:0;
+    }
+    to {
+        left:100%;
+    }
+}
+
+@-webkit-keyframes anim_leave {
+    from {
+        left:0;
+    }
+    to {
+        left:100%;
+    }
+}
+/*Add delete user animation ./*/
+
+
+
+
+
+
+
+
+
+
+
+
 /*Loader nimation*/
 @keyframes flickerAnimation {
     0%   { opacity:1; }
