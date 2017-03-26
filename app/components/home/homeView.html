@@ -4,70 +4,96 @@
     <div class="row">
         <div style="float: none;margin: 0 auto" class="col-lg-4">
 
-            <form name="userForm" ng-submit="regForm(userForm.$valid)" novalidate enctype="multipart/form-data">
-                <div class="form-group"  ng-class="{ 'has-error' : userForm.name.$invalid && !userForm.name.$pristine }">
+
+            <form name="helpForm" novalidate role="form" enctype="multipart/form-data">
+                <div class="form-group">
                     <label >Name</label>
-                    <input name="name" ng-required="true"  type="text" class="form-control" ng-init="user.name='Bob'"  ng-model="user.name" required  placeholder="name">
-                    <p ng-show="userForm.name.$invalid && !userForm.name.$pristine" class="help-block">You name is required.</p>
+                    <!--form validation submit flag "submitted" -->
+                    <span class="label label-danger" data-ng-show="submitted && helpForm.name.$error.required">Required!</span>
+                    <input name="name" data-ng-required="true"  type="text" class="form-control" data-ng-init="user.name='Bob'"  data-ng-model="user.name" required  placeholder="name">
                 </div>
-                <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid && !userForm.username.$pristine }">
+
+                <div class="form-group">
                     <label >Address</label>
-                    <input type="text"  class="form-control" name="address" ng-init="user.address='addr'" ng-model="user.address"  ng-maxlength="10" required  placeholder="Address">
-                    <p ng-show="userForm.address.$error.maxlength" class="help-block">Username is too long.</p>
+                    <span class="label label-danger" data-ng-show="submitted && helpForm.address.$error.required">Required!</span>
+                    <input type="text" class="form-control" name="address" data-ng-init="user.address='addr'" data-ng-model="user.address"  data-ng-maxlength="10" required  placeholder="Address">
                 </div>
+
                 <div class="form-group">
                     <label >Email</label>
-                    <input type="email"  class="form-control" name="email" ng-required="true" ng-init="user.email='bog@ram.ru'" ng-model="user.email"  placeholder="Email">
+                    <span class="label label-danger" data-ng-show="submitted && helpForm.email.$error.required">Required!</span>
+                    <span class="label label-danger" data-ng-show="submitted && helpForm.$error.email">Invalid email!</span>
+                    <input type="email"  class="form-control" name="email" data-ng-required="true" data-ng-init="user.email='bog@ram.ru'" data-ng-model="user.email"  placeholder="Email">
                 </div>
+
                 <div class="form-group">
                     <label >Country</label>
-                    <select name="country" ng-model="user.country">
+                    <select name="country" data-ng-model="user.country">
                         <option value="Ukraine">Ukraine</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password"  class="form-control" ng-model="user.pass" name="pass" id="exampleInputPassword1" placeholder="Password">
-                </div>
 
                 <!--Upload image -->
-                <table style ="width:100%;border:solid;">
-                    <tr>
-                        <td>Select File</td>
-                        <td>
-                            <input type="file" ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)" />
 
-                        </td>
-                    </tr>
+                     <table style ="width:100%;border:solid;">
+                         <tr>
+                             <td>Select File</td>
+                             <td>
+                                 <input type="file" data-ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)" />
 
-                </table>
+                             </td>
+                         </tr>
 
-                <!--ng-click="update(user)"  ng-disabled="userForm.$invalid" -->
-                <button type="submit" class="btn btn-default" ng-click="update(user)" ng-disabled="userForm.$invalid" >Submit</button>
-            </form>
-
-
-        </div>
+                     </table>
 
 
 
-    </div>
 
-    <div style="height: 50px;background-color: #444444" class="row">
 
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <div style="float: none;margin: 0 auto;padding: 20px" class="col-xs-4">
-                <input type="text" ng-model="searchUser" class="form-control">
-            </div>
-        </div>
+                     <button  data-ng-click="submit(helpForm)" class="btn btn-default">Submit</button>
+                 </form>
 
-    </div>
+                 <div id="messages" class="alert alert-success" data-ng-show="messages" data-ng-bind="messages"></div>
 
-    <div id="users-container" style="min-height: 200px;position: relative;max-height: 200px;overflow: hidden !important;" class="col-xs-12 example-animate-container">
-        <!--ajax loader -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                     </div>
+
+
+
+                 </div>
+
+                 <div style="height: 50px;background-color: #444444" class="row">
+
+                 </div>
+                 <div class="row">
+                     <div class="col-xs-12">
+                         <div style="float: none;margin: 0 auto;padding: 20px" class="col-xs-4">
+                             <input type="text" ng-model="searchUser" class="form-control">
+                         </div>
+                     </div>
+
+                 </div>
+
+                 <div id="users-container" style="min-height: 200px;position: relative;opacity: 1;max-height: 200px;overflow: hidden !important;" class="col-xs-12 example-animate-container">
+                     <!--ajax loader -->
         <div ng-show="loading" style="position: absolute;left:0px;top:0px;height: 100%;min-height: 200px;width: 100%;background-color: white;z-index: 1000">
             <div class="animate-flicker" style="position: absolute;top:40%;left:50%;margin-left: -50px;z-index: 500;width: 100px;" >Loading...</div>
         </div>

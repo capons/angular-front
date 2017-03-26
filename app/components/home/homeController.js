@@ -48,7 +48,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     };
 
 
-
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
         $scope.$apply(function (scope) {
@@ -58,48 +57,64 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             }
         });
     };
-        //registration form validation
-        $scope.regForm = function(isValid) {
-        // check to make sure the form is completely valid
-        if (isValid) {
-            //user data
-            $scope.master = {};
-            //save user
-            $scope.update = function(user) {
-                //load upload file service
-                uploadPhoto();
-                function uploadPhoto() {
-                    UserData.uploadPhoto($scope.files,$scope.master,user)
-                        .success(function (data, status, headers, config) {
-                            //add new user to scope -> to see changes
-                            $scope.master = angular.copy(user);
-                            //add file upload path to user data
-                            $scope.master['file_path'] = data;
-                            console.log($scope.master);
-                           //add user
-                            UsersService.post($scope.master)
-                                .success(function (data, status, headers, config) {
-                                    console.log(data);
-                                    //add user data to scope
-                                    //add element to first scope index
-                                    $scope.users.unshift(data.body);
-                                })
-                                .error(function (data, status, header, config) {
-                                    console.log(data);
-                                    console.log(status);
-                                    console.log(header);
-                                });
-                        })
-                        .error(function (data, status, header, config) {
-                            //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                            console.log(data);
-                            console.log(status);
-                            console.log(header);
-                            console.log(config);
-                        });
-                }
-            };
+
+
+    //sabmut register form
+    $scope.submit = function(user) {
+
+        // Trigger validation flag.
+        //flag to display error message
+        $scope.submitted = true;
+        // If form is invalid, return and let AngularJS show validation errors.
+        if (user.$invalid) {
+            return;
         }
+
+        $scope.master = {};
+        //save user
+
+        UserData.uploadPhoto($scope.files, $scope.master, user)
+            .success(function (data, status, headers, config) {
+                //add new user to scope -> to see changes
+                $scope.master = angular.copy(user);
+                //add file upload path to user data
+                $scope.master['file_path'] = data;
+
+                //user param
+                var config = $.param({
+                    data : {
+                        'name' : $scope.user.name,
+                        'email' : $scope.user.email,
+                        'country' : $scope.user.country,
+                        'address' : $scope.user.address,
+                        'file_path' : data,
+                    }
+                });
+
+                UsersService.post('users',config)
+                    .success(function (data, status, headers, config) {
+                        console.log(data);
+                        //add user data to scope
+                        //add element to first scope index
+                        $scope.users.unshift(data.body);
+                        //after form submitted turn false error flag for message
+                        $scope.submitted = false;
+                    })
+                    .error(function (data, status, header, config) {
+                        console.log(data);
+                        console.log(status);
+                        console.log(header);
+                    });
+            })
+            .error(function (data, status, header, config) {
+                //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
+                console.log(data);
+                console.log(status);
+                console.log(header);
+                console.log(config);
+            });
+
+
     };
 
 

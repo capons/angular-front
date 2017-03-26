@@ -16,16 +16,14 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             //  "cache": true
         });
     };
-    this.post = function(param) {
-        var param = $.param({
-            data: param
-        });
+    this.post = function(url,param) {
+
         var conf = {
             headers : {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
             }
         };
-        return $http.post(apiUrl+'users', param, conf);
+        return $http.post(apiUrl+url, param, conf);
     };
     this.delete = function (user_id) {
         var conf = {

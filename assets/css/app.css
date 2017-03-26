@@ -28,19 +28,6 @@
 }
 
 
-/*angular ng-reppeat animation*/
-
-.userAnime {
-    opacity: 1;
-}
-.userAnime.ng-enter {
-    -webkit-transition: 1s;
-    transition: 1s;
-    opacity: 0;
-}
-.userAnime.ng-enter-active {
-    opacity: 1;
-}
 
 
 
@@ -61,6 +48,9 @@
     animation:1.5s anim_enter;
     position:relative;
 }
+
+
+
 @keyframes anim_enter {
     from {
         left:100%;
@@ -80,11 +70,18 @@
 }
 
 .users-anime.ng-leave{
-    -webkit-animation:1.5s anim_leave;
-    -moz-animation:1.5s anim_leave;
-    -o-animation:1.5s anim_leave;
-    animation:1.5s anim_leave;
+
+    -webkit-animation:0.5s anim_leave;
+    -moz-animation:0.5s anim_leave;
+    -o-animation:0.5s anim_leave;
+    animation:0.5s anim_leave;
     position:relative;
+
+
+    /*opacity fade out*/
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 1s, opacity 1s linear;
 }
 
 @keyframes anim_leave {
@@ -104,6 +101,7 @@
         left:100%;
     }
 }
+
 /*Add delete user animation ./*/
 
 
