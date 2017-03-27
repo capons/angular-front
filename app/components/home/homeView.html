@@ -10,7 +10,7 @@
                     <label >Name</label>
                     <!--form validation submit flag "submitted" -->
                     <span class="label label-danger" data-ng-show="submitted && helpForm.name.$error.required">Required!</span>
-                    <input name="name" data-ng-required="true"  type="text" class="form-control" data-ng-init="user.name='Bob'"  data-ng-model="user.name" required  placeholder="name">
+                    <input name="name" data-ng-change="change()" data-ng-required="true"  type="text" class="form-control" data-ng-init="user.name='Bob'"  data-ng-model="user.name" required  placeholder="name">
                 </div>
 
                 <div class="form-group">
@@ -47,38 +47,10 @@
 
                      </table>
 
-
-
-
-
-                     <button  data-ng-click="submit(helpForm)" class="btn btn-default">Submit</button>
+                     <button  data-ng-click="submit(helpForm)" ng-disabled="formButton" class="btn btn-default">Submit</button>
                  </form>
-
-                 <div id="messages" class="alert alert-success" data-ng-show="messages" data-ng-bind="messages"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                     </div>
-
-
-
-                 </div>
+        </div>
+    </div>
 
                  <div style="height: 50px;background-color: #444444" class="row">
 
@@ -86,7 +58,7 @@
                  <div class="row">
                      <div class="col-xs-12">
                          <div style="float: none;margin: 0 auto;padding: 20px" class="col-xs-4">
-                             <input type="text" ng-model="searchUser" class="form-control">
+                             <input type="text" data-ng-model="searchUser" class="form-control">
                          </div>
                      </div>
 

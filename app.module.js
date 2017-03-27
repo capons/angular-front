@@ -68,14 +68,10 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
 
-
     //display all user
     $scope.users = [];
     //ajax loader
     $scope.loading = true;
-    //load service method getUser() -> factory UserService ->  object UserData
-   // $scope.users = UsersService.get();
-
 
     UsersService.get('users')
         .success(function (data, status, headers, config) {
@@ -93,8 +89,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             console.log(header);
         });
 
-
-
     //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
     //number of item in one page
@@ -105,14 +99,12 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     };
 
     //some click loader function display animation
-
     $scope.loader = function(){
         $scope.loading = true;
         $timeout(function () {
             $scope.loading = false;
         }, 500);
     };
-
 
     //add upload file to array ->> need to send file in request
     $scope.setFiles = function (element) {
@@ -124,15 +116,17 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         });
     };
 
-
     //sabmut register form
     $scope.submit = function(user) {
-
+        //disable form button
+        $scope.formButton = true;
         // Trigger validation flag.
         //flag to display error message
         $scope.submitted = true;
         // If form is invalid, return and let AngularJS show validation errors.
         if (user.$invalid) {
+            //enable form button
+            $scope.formButton = false;
             return;
         }
 
@@ -141,6 +135,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
         UserData.uploadPhoto($scope.files, $scope.master, user)
             .success(function (data, status, headers, config) {
+
                 //add new user to scope -> to see changes
                 $scope.master = angular.copy(user);
                 //add file upload path to user data
@@ -159,6 +154,11 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
                 UsersService.post('users',config)
                     .success(function (data, status, headers, config) {
+                        //clear form field
+                        UserData.clearField($scope);
+
+                        //enable form button
+                        $scope.formButton = false;
                         console.log(data);
                         //add user data to scope
                         //add element to first scope index
@@ -179,10 +179,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                 console.log(header);
                 console.log(config);
             });
-
-
     };
-
 
 
     //delete user
@@ -470,7 +467,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
 var UserService = angular.module('UserService', []);
 //app.module -> all constant
-UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
+UserService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
     //object return with service
     var UserData = {};
     //upload user photo
@@ -492,6 +489,14 @@ UserService.factory('UserData', ['$http','apiUrl', function ($http,apiUrl) {
                 fd: fd
             }
         });
+    };
+    //update form fields
+    UserData.clearField = function (scope){
+        scope.user.name = '';
+        scope.user.address = '';
+        scope.user.email = '';
+        scope.user.country = '';
+        angular.element("input[type='file']").val(null);
     };
     return UserData;
 }]);
