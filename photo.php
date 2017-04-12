@@ -1,5 +1,8 @@
 <?php
 
+print_r($_POST);
+die();
+
 
 if(isset($_FILES['uploadedFile'])){
     //The error validation could be done on the javascript client side.
@@ -27,3 +30,4 @@ if(isset($_FILES['uploadedFile'])){
         print_r($errors);
     }
 }
+

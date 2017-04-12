@@ -50,7 +50,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         });
     };
 
-    //sabmut register form
+    //submit register form
     $scope.submit = function(user) {
         //disable form button
         $scope.formButton = true;
@@ -63,13 +63,11 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             $scope.formButton = false;
             return;
         }
-
         $scope.master = {};
         //save user
 
         UserData.uploadPhoto($scope.files, $scope.master, user)
             .success(function (data, status, headers, config) {
-
                 //add new user to scope -> to see changes
                 $scope.master = angular.copy(user);
                 //add file upload path to user data
@@ -133,6 +131,109 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             });
 
     };
+
+
+
+
+
+
+    /*upload file with load bar*/
+    $scope.uploadProgressBar = false;
+    $scope.addPhoto = function() {
+        for (var i in $scope.files) {
+            var form = new FormData();
+            var xhr = new XMLHttpRequest;
+            // Additional POST variables required by the API script
+            form.append('destination', 'workspace://SpacesStore/' + $scope.currentFolderUUID);
+            form.append('contenttype', 'idocs:document');
+            form.append('filename', $scope.files[i].name);
+            form.append('uploadedFile', $scope.files[i]);
+            form.append('overwrite', false);
+            $scope.uploadProgressBar = true;
+            xhr.upload.onprogress = function(e) {
+                // Event listener for when the file is uploading
+                $scope.$apply(function() {
+                    var percentCompleted;
+                    if (e.lengthComputable) {
+                        percentCompleted = Math.round(e.loaded / e.total * 100);
+                        if (percentCompleted < 1) {
+                            // .uploadStatus will get rendered for the user via the template
+                            $scope.files[i].uploadStatus = 'Uploading...';
+                            $scope.progressStyle = {'width':percentCompleted+'%'};
+                        } else if (percentCompleted == 100) {
+                            $scope.files[i].uploadStatus = 'Saving...';
+                            $scope.progressStyle = {'width':100+'%'};
+                            console.log('save');
+                        } else {
+                            console.log(percentCompleted);
+                            $scope.files[i].uploadStatus = percentCompleted + '%';
+                        }
+                    }
+                });
+            };
+            xhr.upload.onload = function(e) {
+                // Event listener for when the file completed uploading
+                $scope.$apply(function() {
+                    $scope.files[i].uploadStatus = 'Uploaded!'
+                    setTimeout(function() {
+                        $scope.$apply(function() {
+                            $scope.files[i].uploadStatus = '';
+                        });
+                    }, 4000);
+                });
+            };
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log(xhr.responseText);
+                    $scope.uploadProgressBar = false;
+                }
+            };
+
+            xhr.open('POST', 'photo.php');
+            xhr.send(form);
+        }
+    };
+
+
+
+    /*upload form with image and multiple fields*/
+    $scope.model = {};
+    $scope.selectedFile = [];
+    $scope.uploadProgress = 0;
+    $scope.uploadFile = function () {
+        var file = $scope.files[0];
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('description', $scope.model.fileDescription);
+        formData.append('rating', $scope.model.rating);
+        formData.append('file_good', $scope.model.isAGoodFile);
+        $http({
+            withCredentials: false,
+            headers: {
+                'Content-Type': undefined
+            },
+            transformRequest: angular.identity,
+            processData:false,
+            contentType:false,
+            url:'photo.php',
+            method:'POST',
+            data: formData,
+        })
+            .then(function onSuccess(data){
+                console.log('ok')
+            })
+    };
+
+
+
+
+
+
+
+
+
+
+
 
 
 

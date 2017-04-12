@@ -12,7 +12,7 @@ UserService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
         }
         //upload user photo
 
-        return $http.post("photo.php", fd, {
+        return $http.post("photo.php", fd, { //photo.php
             withCredentials: false,
             headers: {
                 'Content-Type': undefined
