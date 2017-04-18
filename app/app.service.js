@@ -16,30 +16,9 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             //  "cache": true
         });
     };
-    this.post = function(url,param) {
+    this.post = function(url,param, header) {
 
-        var conf = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-             //   'Content-Type': 'multipart/form-data'
-
-            }
-            /*
-            transformRequest: function (data, headersGetter) {
-                var formData = new FormData();
-                angular.forEach(data, function (value, key) {
-                    formData.append(key, value);
-                });
-
-                var headers = headersGetter();
-                delete headers['Content-Type'];
-
-                return formData;
-            }
-            */
-
-        };
-        return $http.post(apiUrl+url, param, conf);
+        return $http.post(apiUrl+url, param, header)
     };
     this.delete = function (user_id) {
         var conf = {
@@ -48,5 +27,6 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             }
         };
         return  $http.delete(apiUrl+'users/'+user_id, param = null, conf)
-    }
+    };
+
 }]);

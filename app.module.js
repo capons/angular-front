@@ -4,7 +4,7 @@
 
 
 //here need to add service and factory method
-var myApp = angular.module('app',['ngRoute', 'UserService', 'ngAnimate', 'ngResource']);
+var myApp = angular.module('app',['ngRoute', 'UserService', 'ngAnimate', 'ngResource', 'ngFileUpload']);
 
 //project const
 myApp.constant('apiUrl', 'http://api/');
@@ -46,30 +46,9 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             //  "cache": true
         });
     };
-    this.post = function(url,param) {
+    this.post = function(url,param, header) {
 
-        var conf = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-             //   'Content-Type': 'multipart/form-data'
-
-            }
-            /*
-            transformRequest: function (data, headersGetter) {
-                var formData = new FormData();
-                angular.forEach(data, function (value, key) {
-                    formData.append(key, value);
-                });
-
-                var headers = headersGetter();
-                delete headers['Content-Type'];
-
-                return formData;
-            }
-            */
-
-        };
-        return $http.post(apiUrl+url, param, conf);
+        return $http.post(apiUrl+url, param, header)
     };
     this.delete = function (user_id) {
         var conf = {
@@ -78,7 +57,8 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             }
         };
         return  $http.delete(apiUrl+'users/'+user_id, param = null, conf)
-    }
+    };
+
 }]);
 
 
@@ -92,19 +72,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     UsersService.get('users')
         .success(function (data, status, headers, config) {
             console.log(data);
-            //console.log(data.body);
-           // console.log(data);
             $scope.users = data.body;//angular.fromJson(responseData);
-            //  angular.forEach(data.data, function(item){
-            //  });
-            //ajax loader off
             $scope.loading = false;
         })
         .error(function (data, status, header, config) {
             console.log(status);
             console.log(header);
         });
-
     //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
     //number of item in one page
@@ -148,51 +122,13 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         $scope.master = {};
         //save user
 
-        UserData.uploadPhoto($scope.files, $scope.master, user)
-            .success(function (data, status, headers, config) {
-                //add new user to scope -> to see changes
-                $scope.master = angular.copy(user);
-                //add file upload path to user data
-                $scope.master['file_path'] = data;
+        $scope.master = angular.copy(user);
+        //add file upload path to user data
+       // $scope.master['file_path'] = data;
 
-                //user param
-                var config = $.param({
-                    data : {
-                        'name' : $scope.user.name,
-                        'email' : $scope.user.email,
-                        'country' : $scope.user.country,
-                        'address' : $scope.user.address,
-                        'file_path' : data,
-                    }
-                });
+        //user param
+        uploadBar($scope); //$scope.files, $scope.user
 
-                UsersService.post('users',config)
-                    .success(function (data, status, headers, config) {
-                        //clear form field
-                        UserData.clearField($scope);
-
-                        //enable form button
-                        $scope.formButton = false;
-                        console.log(data);
-                        //add user data to scope
-                        //add element to first scope index
-                        $scope.users.unshift(data.body);
-                        //after form submitted turn false error flag for message
-                        $scope.submitted = false;
-                    })
-                    .error(function (data, status, header, config) {
-                        console.log(data);
-                        console.log(status);
-                        console.log(header);
-                    });
-            })
-            .error(function (data, status, header, config) {
-                //Если пользователь не сохранился то нужно удалить картинкку которую мы загрузили перед тем как отправили даные пользователя
-                console.log(data);
-                console.log(status);
-                console.log(header);
-                console.log(config);
-            });
     };
 
 
@@ -214,23 +150,18 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     };
 
-
-
-
-
-
-    /*upload file with load bar*/
-    $scope.uploadProgressBar = false;
-    $scope.addPhoto = function() {
-        for (var i in $scope.files) {
+    //send registration form with file and show upload bar
+    function uploadBar($scope) { //file, user
+      //  for (var i in file) {
             var form = new FormData();
             var xhr = new XMLHttpRequest;
             // Additional POST variables required by the API script
-            form.append('destination', 'workspace://SpacesStore/' + $scope.currentFolderUUID);
-            form.append('contenttype', 'idocs:document');
-            form.append('filename', $scope.files[i].name);
-            form.append('uploadedFile', $scope.files[i]);
-            form.append('overwrite', false);
+            form.append('file', $scope.files[0]);
+            form.append('name', $scope.user.name);
+            form.append('email', $scope.user.email);
+            form.append('country', $scope.user.country);
+            form.append('address',$scope.user.address);
+
             $scope.uploadProgressBar = true;
             xhr.upload.onprogress = function(e) {
                 // Event listener for when the file is uploading
@@ -240,15 +171,15 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                         percentCompleted = Math.round(e.loaded / e.total * 100);
                         if (percentCompleted < 1) {
                             // .uploadStatus will get rendered for the user via the template
-                            $scope.files[i].uploadStatus = 'Uploading...';
+                            $scope.files[0].uploadStatus = 'Uploading...';
                             $scope.progressStyle = {'width':percentCompleted+'%'};
                         } else if (percentCompleted == 100) {
-                            $scope.files[i].uploadStatus = 'Saving...';
+                            $scope.files[0].uploadStatus = 'Saving...';
                             $scope.progressStyle = {'width':100+'%'};
                             console.log('save');
                         } else {
                             console.log(percentCompleted);
-                            $scope.files[i].uploadStatus = percentCompleted + '%';
+                            $scope.files[0].uploadStatus = percentCompleted + '%';
                         }
                     }
                 });
@@ -256,55 +187,32 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             xhr.upload.onload = function(e) {
                 // Event listener for when the file completed uploading
                 $scope.$apply(function() {
-                    $scope.files[i].uploadStatus = 'Uploaded!'
+                    $scope.files[0].uploadStatus = 'Uploaded!'
                     setTimeout(function() {
                         $scope.$apply(function() {
-                            $scope.files[i].uploadStatus = '';
+                            $scope.files[0].uploadStatus = '';
                         });
                     }, 4000);
                 });
             };
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    console.log(xhr.responseText);
+                    UserData.clearField($scope);
+                    //enable form button
+                    $scope.formButton = false;
+                    //pars json from API
+                    var response = JSON.parse(xhr.responseText);
+                    $scope.users.unshift(response.body);
+                    //after form submitted turn false error flag for message
+                    $scope.submitted = false;
+                    //disabled progress bar
                     $scope.uploadProgressBar = false;
                 }
             };
-
-            xhr.open('POST', 'photo.php');
+            xhr.open('POST', apiUrl+'users', true);
             xhr.send(form);
-        }
-    };
-
-
-
-    /*upload form with image and multiple fields*/
-    $scope.model = {};
-    $scope.selectedFile = [];
-    $scope.uploadProgress = 0;
-    $scope.uploadFile = function () {
-        var file = $scope.files[0];
-        var formData = new FormData();
-        formData.append('file', file);
-        formData.append('description', $scope.model.fileDescription);
-        formData.append('rating', $scope.model.rating);
-        formData.append('file_good', $scope.model.isAGoodFile);
-        $http({
-            withCredentials: false,
-            headers: {
-                'Content-Type': undefined
-            },
-            transformRequest: angular.identity,
-            processData:false,
-            contentType:false,
-            url:'photo.php',
-            method:'POST',
-            data: formData,
-        })
-            .then(function onSuccess(data){
-                console.log('ok')
-            })
-    };
+      //  }
+    }
 
 
 
@@ -587,26 +495,7 @@ var UserService = angular.module('UserService', []);
 UserService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
     //object return with service
     var UserData = {};
-    //upload user photo
-    UserData.uploadPhoto = function (files,master,user){
-        var fd = new FormData();
-        for (var i in files) {
-            //get file name to send in API server
-            fd.append("uploadedFile", files[i])
-        }
-        //upload user photo
 
-        return $http.post("photo.php", fd, { //photo.php
-            withCredentials: false,
-            headers: {
-                'Content-Type': undefined
-            },
-            transformRequest: angular.identity,
-            params: {
-                fd: fd
-            }
-        });
-    };
     //update form fields
     UserData.clearField = function (scope){
         scope.user.name = '';

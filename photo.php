@@ -1,7 +1,5 @@
 <?php
 
-print_r($_POST);
-die();
 
 
 if(isset($_FILES['uploadedFile'])){
