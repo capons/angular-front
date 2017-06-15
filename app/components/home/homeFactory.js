@@ -1,6 +1,6 @@
-var UserService = angular.module('UserService', []);
+var UsersService = angular.module('UsersService', []);
 //app.module -> all constant
-UserService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
+UsersService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
     //object return with service
     var UserData = {};
 

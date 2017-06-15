@@ -3,13 +3,28 @@
   "version": "0.0.1",
   "description": "Client-A Dashboard",
   "dependencies": {
+    "@angular/common": "~4.0.0",
+    "@angular/compiler": "~4.0.0",
+    "@angular/core": "~4.0.0",
+    "@angular/forms": "~4.0.0",
+    "@angular/http": "~4.0.0",
+    "@angular/platform-browser": "~4.0.0",
+    "@angular/platform-browser-dynamic": "~4.0.0",
+    "@angular/router": "~4.0.0",
+    "angular-in-memory-web-api": "~0.3.0",
+    "core-js": "^2.4.1",
     "express": "latest",
+    "gulp-install": "^1.1.0",
     "jade": "latest",
-    "socket.io": "latest"
+    "rxjs": "5.0.1",
+    "socket.io": "latest",
+    "systemjs": "0.19.40",
+    "zone.js": "^0.8.4"
   },
   "author": "bo",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0"
+    "gulp-concat": "^2.6.0",
+    "gulp-install": "^1.1.0"
   }
 }

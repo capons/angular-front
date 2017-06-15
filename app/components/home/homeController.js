@@ -8,15 +8,15 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     $scope.loading = true;
 
     UsersService.get('users')
-        .success(function (data, status, headers, config) {
-            console.log(data);
-            $scope.users = data.body;//angular.fromJson(responseData);
+        .then(function (data, status, headers, config) {
+            console.log(data.data.body);
+            $scope.users = data.data.body;//angular.fromJson(responseData);
             $scope.loading = false;
         })
-        .error(function (data, status, header, config) {
-            console.log(status);
-            console.log(header);
-        });
+        ,function (error) {
+            console.log(error);
+
+        };
     //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
     //number of item in one page
@@ -73,18 +73,18 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //delete user
     $scope.delete = function (user_id,item) {
         UsersService.delete(user_id,item)
-            .success(function (data) {
+            .then(function (data) {
                 //remove element from users scope
                 var index = $scope.users.indexOf(item);
                 $scope.users.splice(index, 1);
               //  console.log(data);
             })
-            .error(function (data, status, header, config) {
-              //  console.log(data);
+            ,function (error) {
+              //  console.log(error);
               //  console.log(status);
               //  console.log(header);
               //  console.log(config);
-            });
+            };
 
     };
 
@@ -140,6 +140,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                     $scope.formButton = false;
                     //pars json from API
                     var response = JSON.parse(xhr.responseText);
+                    console.log(response);
                     $scope.users.unshift(response.body);
                     //after form submitted turn false error flag for message
                     $scope.submitted = false;

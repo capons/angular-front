@@ -4,7 +4,7 @@
 
 
 //here need to add service and factory method
-var myApp = angular.module('app',['ngRoute', 'UserService', 'ngAnimate', 'ngResource', 'ngFileUpload']);
+var myApp = angular.module('app',['ngRoute', 'UsersService', 'ngAnimate', 'ngResource', 'ngFileUpload']);
 
 //project const
 myApp.constant('apiUrl', 'http://api/');
@@ -61,6 +61,36 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
 
 }]);
 
+myApp.directive('activeLink', ['$location', function (location) {
+    //create menu active links
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller) {
+            var clazz = attrs.activeLink;
+            var path = attrs.href;
+            scope.location = location;
+            scope.$watch('location.path()', function (newPath) {
+                if (path === newPath) {
+                    element.addClass(clazz);
+                } else {
+                    element.removeClass(clazz);
+                }
+            });
+        }
+    };
+}]);
+
+
+
+
+myApp.controller('saleController', ['$scope', '$interval', '$location', function ($scope, $interval, $location) {
+   console.log('sale controller');
+}]);
+/**
+ * Created by User on 11/11/2016.
+ */
+
+
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
 
@@ -70,15 +100,15 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     $scope.loading = true;
 
     UsersService.get('users')
-        .success(function (data, status, headers, config) {
-            console.log(data);
-            $scope.users = data.body;//angular.fromJson(responseData);
+        .then(function (data, status, headers, config) {
+            console.log(data.data.body);
+            $scope.users = data.data.body;//angular.fromJson(responseData);
             $scope.loading = false;
         })
-        .error(function (data, status, header, config) {
-            console.log(status);
-            console.log(header);
-        });
+        ,function (error) {
+            console.log(error);
+
+        };
     //pagination users data //pagination filter "startFrom"
     $scope.currentPage = 0;
     //number of item in one page
@@ -135,18 +165,18 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
     //delete user
     $scope.delete = function (user_id,item) {
         UsersService.delete(user_id,item)
-            .success(function (data) {
+            .then(function (data) {
                 //remove element from users scope
                 var index = $scope.users.indexOf(item);
                 $scope.users.splice(index, 1);
               //  console.log(data);
             })
-            .error(function (data, status, header, config) {
-              //  console.log(data);
+            ,function (error) {
+              //  console.log(error);
               //  console.log(status);
               //  console.log(header);
               //  console.log(config);
-            });
+            };
 
     };
 
@@ -202,6 +232,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                     $scope.formButton = false;
                     //pars json from API
                     var response = JSON.parse(xhr.responseText);
+                    console.log(response);
                     $scope.users.unshift(response.body);
                     //after form submitted turn false error flag for message
                     $scope.submitted = false;
@@ -490,9 +521,9 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
         */
     }]);
 
-var UserService = angular.module('UserService', []);
+var UsersService = angular.module('UsersService', []);
 //app.module -> all constant
-UserService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
+UsersService.factory('UserData', ['$http', 'apiUrl', function ($http,apiUrl) {
     //object return with service
     var UserData = {};
 
@@ -513,33 +544,3 @@ myApp.filter('startFrom', function() {
         return input.slice(start);
     }
 });
-
-
-
-myApp.controller('saleController', ['$scope', '$interval', '$location', function ($scope, $interval, $location) {
-   console.log('sale controller');
-}]);
-/**
- * Created by User on 11/11/2016.
- */
-
-
-myApp.directive('activeLink', ['$location', function (location) {
-    //create menu active links
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-            var clazz = attrs.activeLink;
-            var path = attrs.href;
-            scope.location = location;
-            scope.$watch('location.path()', function (newPath) {
-                if (path === newPath) {
-                    element.addClass(clazz);
-                } else {
-                    element.removeClass(clazz);
-                }
-            });
-        }
-    };
-}]);
-
