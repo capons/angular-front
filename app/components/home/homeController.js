@@ -125,7 +125,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             xhr.upload.onload = function(e) {
                 // Event listener for when the file completed uploading
                 $scope.$apply(function() {
-                    $scope.files[0].uploadStatus = 'Uploaded!'
+                    $scope.files[0].uploadStatus = 'Uploaded!';
                     setTimeout(function() {
                         $scope.$apply(function() {
                             $scope.files[0].uploadStatus = '';
@@ -140,18 +140,36 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                     $scope.formButton = false;
                     //pars json from API
                     var response = JSON.parse(xhr.responseText);
-                    console.log(response);
-                    $scope.users.unshift(response.body);
+                    if(response.status) {
+                        //if error do not exist add object to dom
+                        $scope.users.unshift(response.body);
+                    } else {
+                        //display error
+                        $scope.errorMessage = true;
+                        $scope.errors = response.error;
+                    }
                     //after form submitted turn false error flag for message
                     $scope.submitted = false;
                     //disabled progress bar
                     $scope.uploadProgressBar = false;
+                    // $scope.errorMessage = false;
                 }
             };
             xhr.open('POST', apiUrl+'users', true);
             xhr.send(form);
       //  }
     }
+
+
+    //hide error message if exist
+    $scope.$watch('errorMessage', function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+            $timeout(function () {
+                $scope.errorMessage = false;
+            }, 5000);
+        }
+    });
+    
 
 
 
