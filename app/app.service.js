@@ -30,3 +30,4 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
     };
 
 }]);
+

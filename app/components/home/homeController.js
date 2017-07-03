@@ -1,7 +1,6 @@
 
 
-myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
-
+myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', 'USER_ROLES' , 'Session', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, USER_ROLES, Session) {
     //display all user
     $scope.users = [];
     //ajax loader

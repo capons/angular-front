@@ -1,32 +1,67 @@
 
-
-
-
-
 //here need to add service and factory method
 var myApp = angular.module('app',['ngRoute', 'UsersService', 'ngAnimate', 'ngResource', 'ngFileUpload']);
 
 //project const
 myApp.constant('apiUrl', 'http://api/');
 
+//auth constant
+myApp.constant('AUTH_EVENTS', {
+    loginSuccess: 'auth-login-success',
+    loginFailed: 'auth-login-failed',
+    logoutSuccess: 'auth-logout-success',
+    sessionTimeout: 'auth-session-timeout',
+    notAuthenticated: 'auth-not-authenticated',
+    notAuthorized: 'auth-not-authorized'
+});
 
+//role constant
+myApp.constant('USER_ROLES', {
+    all: '*',
+    admin: 'admin',
+    editor: 'editor',
+    guest: 'guest'
+});
 
-//app routes
-myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$locationProvider) {
+//auth directive
+myApp.directive('loginDialog', function (AUTH_EVENTS) {
+    return {
+        restrict: 'A',
+        template: '<div ng-if="visible" ng-include=login-form.html>',
+        link: function (scope) {
+            var showDialog = function () {
+                scope.visible = true;
+            };
 
-    $locationProvider.html5Mode(true); //help to remove # from URL
-    $routeProvider.
-    when('/home', {
-        templateUrl: 'app/components/home/homeView.html',
-        controller:'homeController'
-    }).
-    when('/sale', {
-        templateUrl: 'app/components/sale/saleView.html',
-        controller: 'saleController' }).
-    otherwise({ redirectTo: '/home' });
+            scope.visible = false;
+            scope.$on(AUTH_EVENTS.notAuthenticated, showDialog);
+            scope.$on(AUTH_EVENTS.sessionTimeout, showDialog)
+        }
+    };
+});
 
+//login form directive
+myApp.directive('formAutofillFix', function ($timeout) {
+    return function (scope, element, attrs) {
+        element.prop('method', 'post');
+        if (attrs.ngSubmit) {
+            $timeout(function () {
+                element
+                    .unbind('submit')
+                    .bind('submit', function (event) {
+                        event.preventDefault();
+                        element
+                            .find('input, textarea, select')
+                            .trigger('input')
+                            .trigger('change')
+                            .trigger('keydown');
+                        scope.$apply(attrs.ngSubmit);
+                    });
+            });
+        }
+    };
+});
 
-}]);
 
 //service example
 myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
@@ -62,8 +97,55 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
 }]);
 
 
-myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
 
+//app routes
+myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$locationProvider) {
+    $locationProvider.html5Mode(true); //help to remove # from URL
+    $routeProvider.
+    when('/home', {
+        templateUrl: 'app/components/home/homeView.html',
+        controller:'homeController'
+    }).
+    when('/sale', {
+        templateUrl: 'app/components/sale/saleView.html',
+        controller: 'saleController'
+    }).
+    when('/login', {
+        templateUrl: 'app/components/login/loginView.html',
+        controller: 'loginController'
+    }).
+    when('/chat', {
+        templateUrl: 'app/components/chat/index.html',
+        controller: 'loginController',
+        
+
+
+    }).
+    otherwise({ redirectTo: '/home' });
+
+}]);
+
+
+//global application controller
+myApp.controller('applicationController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', 'AuthService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, USER_ROLES, AuthService) {
+    //define login user object
+    $scope.currentUser = null;
+    $scope.userRoles = USER_ROLES;
+    $scope.isAuthorized = AuthService.isAuthorized;
+    $scope.setCurrentUser = function (user) {
+        $scope.currentUser = user;
+    };
+
+}]);
+
+
+myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
+    console.log('ok')
+
+}]);
+
+
+myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', 'USER_ROLES' , 'Session', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, USER_ROLES, Session) {
     //display all user
     $scope.users = [];
     //ajax loader
@@ -533,6 +615,11 @@ myApp.filter('startFrom', function() {
     }
 });
 
+myApp.controller('loginController', ['$scope', '$http',  function ($scope, $http) {
+    
+      
+    
+}]);
 
 
 myApp.controller('saleController', ['$scope', '$interval', '$location', function ($scope, $interval, $location) {

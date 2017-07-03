@@ -13,12 +13,26 @@
     <!--importent for angular routing -->
     <base href="http://ng-front.com/"/>
 </head>
-<body ng-app="app">
+<body ng-app="app" >
 
     <nav class="ds-table" >
         <a class="nav-button" href="/home" active-link="active">Home</a> <!--active-link -> my custome directive for active menu -->
         <a class="nav-button" href="/sale" active-link="active">Sale</a>
     </nav>
+    <!--Auth user description -->
+    <div ng-if="currentUser">Welcome, {{ currentUser.name }}</div>
+
+    <div ng-if="isAuthorized(userRoles.admin)">You're admin.</div>
+
+    <div ng-switch on="currentUser.role">
+        <div ng-switch-when="userRoles.admin">You're admin.</div>
+        <div ng-switch-when="userRoles.editor">You're editor.</div>
+        <div ng-switch-default>You did not login!</div>
+    </div>
+    <!-- ./-->
+
+
+
     <!--angular main container -->
     <div ng-view></div>
 
@@ -39,7 +53,7 @@
     <script src="node_modules/ng-file-upload/dist/ng-file-upload-shim.min.js"></script> <!-- for no html5 browsers support -->
     <script src="node_modules/ng-file-upload/dist/ng-file-upload.js"></script>
 
-
-
+    <!--auth dialog -->
+    <div login-dialog ng-if="!isLoginPage"></div>
 </body>
 </html>
