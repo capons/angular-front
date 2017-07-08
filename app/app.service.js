@@ -31,3 +31,24 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
 
 }]);
 
+//permission factory
+myApp.factory('Auth',['$window', function($window){
+    // localStorage key
+    var key = 'loginParam';
+
+    return{
+        setUser : function(user){
+            $window.localStorage.setItem(key,user);
+           // user = aUser;
+        },
+        isLoggedIn : function(){
+           // return(user)? user : false;
+            var loginParam = $window.localStorage.getItem(key);
+            return(loginParam)? loginParam : false ;
+        },
+        //logOut
+        logOut: function () {
+            $window.localStorage.removeItem(key)
+        }
+    }
+}]);

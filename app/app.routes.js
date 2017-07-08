@@ -17,12 +17,8 @@ myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$lo
     }).
     when('/chat', {
         templateUrl: 'app/components/chat/index.html',
-        controller: 'loginController',
-        
-
-
+        controller: 'chatController'
     }).
-    otherwise({ redirectTo: '/home' });
-
+    otherwise({ redirectTo: '/home' })
 }]);
 
