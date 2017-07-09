@@ -2,5 +2,22 @@
     <h1>Login form</h1>
 
 
+    <form name="loginForm" novalidate role="form">
+        <div class="form-group">
+            <label >Email</label>
+            <!--form validation submit flag "submitted" -->
+            <span class="label label-danger" data-ng-show="submitted && loginForm.email.$error.required">Required!</span>
+            <input name="email" data-ng-change="change()" data-ng-required="true"  type="text" class="form-control" data-ng-init="customer.email='bog@ram.ru'"  data-ng-model="customer.email" required  placeholder="Login">
+        </div>
+
+        <div class="form-group">
+            <label >Password</label>
+            <span class="label label-danger" data-ng-show="submitted && loginForm.password.$error.required">Required!</span>
+            <input type="text" class="form-control" name="pass" data-ng-init="customer.pass='111111'" data-ng-model="customer.pass"  data-ng-maxlength="10" required  placeholder="Password">
+        </div>
+
+        <button  data-ng-click="submit(loginForm)" ng-disabled="formButton" class="btn btn-default">Submit</button>
+    </form>
+
 
 </div>

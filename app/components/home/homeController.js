@@ -8,7 +8,6 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     UsersService.get('users')
         .then(function (data, status, headers, config) {
-            console.log(data.data.body);
             $scope.users = data.data.body;//angular.fromJson(responseData);
             $scope.loading = false;
         })

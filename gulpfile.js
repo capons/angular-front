@@ -9,7 +9,9 @@ gulp.task('js', function () {
         'app/app.service.js',
         'app/app.routes.js',
         'app/components/**/*.js',
-        'app/layout/**/*.js'
+        'app/layout/**/*.js',
+        'app/login/**/*.js',
+        'app/chat/**/*.js'
     ])
         .pipe(concat('app.module.js'))
         .pipe(gulp.dest('.'))

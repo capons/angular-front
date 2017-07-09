@@ -16,9 +16,9 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
             //  "cache": true
         });
     };
-    this.post = function(url,param, header) {
+    this.post = function(url, param, header) {
+         return $http.post(apiUrl+url, param, header)
 
-        return $http.post(apiUrl+url, param, header)
     };
     this.delete = function (user_id) {
         var conf = {
