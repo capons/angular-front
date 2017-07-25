@@ -1,6 +1,7 @@
 
-var gulp = require('gulp')
-var concat = require('gulp-concat')
+var gulp = require('gulp');
+var concat = require('gulp-concat');
+
 
 gulp.task('js', function () {
     gulp.src([
@@ -12,7 +13,7 @@ gulp.task('js', function () {
         'app/layout/**/*.js'
     ])
         .pipe(concat('app.module.js'))
-        .pipe(gulp.dest('.'))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('watch', ['js'], function () {

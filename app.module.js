@@ -150,6 +150,22 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
     */
 
 }]);
+myApp.controller('loginController', ['$scope', '$http', 'Auth',  function ($scope, $http, Auth) {
+
+   // var user = [user = ['user data']];
+    //login
+    //Auth.setUser(user);
+    //logOut
+    //Auth.logOut();
+    console.log('login controller');
+    $scope.login = function () {
+        // Ask to the server, do your job and THEN set the user
+        var user = [user = ['user data']];
+        Auth.setUser(user); //Update the state of the user in the app
+    };
+      
+    
+}]);
 
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
@@ -622,22 +638,6 @@ myApp.filter('startFrom', function() {
     }
 });
 
-myApp.controller('loginController', ['$scope', '$http', 'Auth',  function ($scope, $http, Auth) {
-
-   // var user = [user = ['user data']];
-    //login
-    //Auth.setUser(user);
-    //logOut
-    //Auth.logOut();
-    console.log('login controller');
-    $scope.login = function () {
-        // Ask to the server, do your job and THEN set the user
-        var user = [user = ['user data']];
-        Auth.setUser(user); //Update the state of the user in the app
-    };
-      
-    
-}]);
 
 
 myApp.controller('saleController', ['$scope', '$interval', '$location', function ($scope, $interval, $location) {
