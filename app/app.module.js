@@ -7,14 +7,13 @@ myApp.constant('apiUrl', 'http://api/');
 
 
 //watch permission route
-myApp.run(['$rootScope', '$location', 'Auth', '$routeParams', function ($rootScope, $location, Auth ,$routeParams) {
+myApp.run(['$rootScope', '$location', 'Auth', '$routeParams',function ($rootScope, $location, Auth ,$routeParams) {
     //admin permission route
     var permissionRoute = [
         'chat'
     ];
     //route change event - check if user have permission
     $rootScope.$on('$routeChangeStart', function (event) {
-
         var currentRoute = $location.path();
         var route = currentRoute.replace("/","");
         if(permissionRoute.indexOf(route) == 0) {

@@ -7,14 +7,13 @@ myApp.constant('apiUrl', 'http://api/');
 
 
 //watch permission route
-myApp.run(['$rootScope', '$location', 'Auth', '$routeParams', function ($rootScope, $location, Auth ,$routeParams) {
+myApp.run(['$rootScope', '$location', 'Auth', '$routeParams',function ($rootScope, $location, Auth ,$routeParams) {
     //admin permission route
     var permissionRoute = [
         'chat'
     ];
     //route change event - check if user have permission
     $rootScope.$on('$routeChangeStart', function (event) {
-
         var currentRoute = $location.path();
         var route = currentRoute.replace("/","");
         if(permissionRoute.indexOf(route) == 0) {
@@ -78,7 +77,7 @@ myApp.factory('Auth',['$window', function($window){
 
     return{
         setUser : function(user){
-            $window.localStorage.setItem(key,user);
+            $window.localStorage.setItem(key,JSON.stringify(user));
            // user = aUser;
         },
         isLoggedIn : function(){
@@ -91,7 +90,7 @@ myApp.factory('Auth',['$window', function($window){
             $window.localStorage.removeItem(key)
         }
     }
-}]);
+}]);;
 
 //app routes
 myApp.config(['$routeProvider','$locationProvider', function ($routeProvider,$locationProvider) {
@@ -131,6 +130,9 @@ myApp.controller('applicationController', ['$scope', '$http', '$interval', '$loc
 
 
 myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
+
+   
+
    console.log('test');
     /*//login permission check in current controller
     Auth.setUser({user:'test'});
@@ -150,6 +152,25 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
     */
 
 }]);
+myApp.controller('defaultCtrl', ['$rootScope','$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($rootScope, $scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
+//route change event - check if user have permission
+
+
+
+
+    $scope.isLoggin = true;
+    //show login or logout button
+    //(!Auth.isLoggedIn()) ? $scope.isLoggin = false :   $scope.isLoggin = true ;
+    //logOut function
+    $scope.logOut = function () {
+        Auth.logOut();
+        $window.location.href = '/home';
+    }
+    $rootScope.$on('$routeChangeStart', function (event) {
+        (!Auth.isLoggedIn()) ? $scope.isLoggin = false :   $scope.isLoggin = true ;
+    });
+}]);
+
 
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
@@ -621,16 +642,9 @@ myApp.filter('startFrom', function() {
     }
 });
 
-myApp.controller('loginController', ['$scope', '$http', 'Auth',  'UsersService', 'apiUrl', function ($scope, $http, Auth, UsersService, apiUrl) {
-
-   // var user = [user = ['user data']];
-    //login
-    //Auth.setUser(user);
-    //logOut
-    //Auth.logOut();
-    //submit register form
+myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'UsersService', 'apiUrl', function ($window, $scope, $http, Auth, UsersService, apiUrl) {
+    //submit login form
     $scope.submit = function(login) {
-
         //disable form button
         $scope.formButton = true;
         // Trigger validation flag.
@@ -647,18 +661,19 @@ myApp.controller('loginController', ['$scope', '$http', 'Auth',  'UsersService',
             }
         };
         var param = $.param({email: $scope.customer.email, password: $scope.customer.pass});
-     
-
         //user param
         //uploadBar($scope); //$scope.files, $scope.user
-        //delete user
-      //  $scope.delete = function (user_id,item) {
-
-        
             UsersService.post('login', param, config)
                 .then(function (data) {
-
-                      console.log(data);
+                    //return data from API
+                    if(data.status) {
+                        var user = [data.data.body];
+                        Auth.setUser(user);
+                        $scope.formButton = false;
+                        $window.location.href = '/chat';
+                    } else {
+                        console.log(data.error);
+                    }
                 })
                 ,function (error) {
                       console.log(error);
@@ -666,10 +681,6 @@ myApp.controller('loginController', ['$scope', '$http', 'Auth',  'UsersService',
                 //  console.log(header);
                 //  console.log(config);
             };
-            
-
-     //   };
-
     };
     
     

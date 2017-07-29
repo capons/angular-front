@@ -1,4 +1,7 @@
 myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
+
+   
+
    console.log('test');
     /*//login permission check in current controller
     Auth.setUser({user:'test'});

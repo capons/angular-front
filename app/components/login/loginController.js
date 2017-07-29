@@ -1,13 +1,6 @@
-myApp.controller('loginController', ['$scope', '$http', 'Auth',  'UsersService', 'apiUrl', function ($scope, $http, Auth, UsersService, apiUrl) {
-
-   // var user = [user = ['user data']];
-    //login
-    //Auth.setUser(user);
-    //logOut
-    //Auth.logOut();
-    //submit register form
+myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'UsersService', 'apiUrl', function ($window, $scope, $http, Auth, UsersService, apiUrl) {
+    //submit login form
     $scope.submit = function(login) {
-
         //disable form button
         $scope.formButton = true;
         // Trigger validation flag.
@@ -24,18 +17,19 @@ myApp.controller('loginController', ['$scope', '$http', 'Auth',  'UsersService',
             }
         };
         var param = $.param({email: $scope.customer.email, password: $scope.customer.pass});
-     
-
         //user param
         //uploadBar($scope); //$scope.files, $scope.user
-        //delete user
-      //  $scope.delete = function (user_id,item) {
-
-        
             UsersService.post('login', param, config)
                 .then(function (data) {
-
-                      console.log(data);
+                    //return data from API
+                    if(data.status) {
+                        var user = [data.data.body];
+                        Auth.setUser(user);
+                        $scope.formButton = false;
+                        $window.location.href = '/chat';
+                    } else {
+                        console.log(data.error);
+                    }
                 })
                 ,function (error) {
                       console.log(error);
@@ -43,10 +37,6 @@ myApp.controller('loginController', ['$scope', '$http', 'Auth',  'UsersService',
                 //  console.log(header);
                 //  console.log(config);
             };
-            
-
-     //   };
-
     };
     
     

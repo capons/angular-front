@@ -13,16 +13,19 @@
     <!--importent for angular routing -->
     <base href="http://ng-front.com/"/>
 </head>
-<body ng-app="app" >
+<body data-ng-app="app" ng-controller="defaultCtrl">
 
     <nav class="ds-table" >
-        <a class="nav-button" href="/home" active-link="active">Home</a> <!--active-link -> my custome directive for active menu -->
+        <a class="nav-button" href="/home" active-link="active">Home</a> <!--active-link -> my custom directive for active menu -->
         <a class="nav-button" href="/sale" active-link="active">Sale</a>
+        <a class="nav-button" href="/chat" active-link="active">Chat</a>
+        <a class="nav-button" ng-hide="isLoggin" href="/login" active-link="active">Login</a>
+        <a class="nav-button" ng-show="isLoggin" ng-click="logOut()" active-link="active">Logout</a>
     </nav>
 
 
     <!--angular main container -->
-    <div ng-view></div>
+    <div data-ng-view></div>
 
 
     <!--
@@ -31,16 +34,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
+
     <script src="node_modules/angular/angular.min.js"></script>
     <script src="node_modules/angular-resource/angular-resource.min.js"></script>
-    <script src="node_modules/angular-animate/angular-animate.js"></script>
     <script src="node_modules/angular-route/angular-route.min.js"></script>
     <script src="node_modules/ng-pagination/src/directive.pagination.js"></script>
+    <script src="node_modules/angular-animate/angular-animate.js"></script>
+
     <script src="app.module.js"></script>
     <!--progress bar -->
     <script src="node_modules/ng-file-upload/dist/ng-file-upload-shim.min.js"></script> <!-- for no html5 browsers support -->
     <script src="node_modules/ng-file-upload/dist/ng-file-upload.js"></script>
 
-
+    <script src="app/components/default/defaultCtrl.js"></script>
 </body>
 </html>

@@ -38,7 +38,7 @@ myApp.factory('Auth',['$window', function($window){
 
     return{
         setUser : function(user){
-            $window.localStorage.setItem(key,user);
+            $window.localStorage.setItem(key,JSON.stringify(user));
            // user = aUser;
         },
         isLoggedIn : function(){
@@ -51,4 +51,4 @@ myApp.factory('Auth',['$window', function($window){
             $window.localStorage.removeItem(key)
         }
     }
-}]);
+}]);;

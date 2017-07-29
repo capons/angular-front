@@ -1,20 +1,17 @@
 
-var gulp = require('gulp')
-var concat = require('gulp-concat')
+var gulp = require('gulp');
+var concat = require('gulp-concat');
+
 
 gulp.task('js', function () {
     gulp.src([
-       // 'app/**/*.js'
         'app/app.module.js',
         'app/app.service.js',
         'app/app.routes.js',
-        'app/components/**/*.js',
-        'app/layout/**/*.js',
-        'app/login/**/*.js',
-        'app/chat/**/*.js'
+        'app/components/**/*.js'
     ])
         .pipe(concat('app.module.js'))
-        .pipe(gulp.dest('.'))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('watch', ['js'], function () {

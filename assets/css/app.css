@@ -1,5 +1,5 @@
 .nav-button {
-    width: 50%;
+    width: 25%;
     display: block;
     float: left;
     text-align: center;
@@ -20,8 +20,8 @@
     width: 100%;
 }
 .active {
-    background-color: rgba(80, 96, 109, 0.56);
-    border-bottom: 10px solid rgba(80, 96, 109, 0.56);
+    background-color: rgba(10, 97, 39, 0.46);
+    border-bottom: 10px solid rgba(80, 10, 109, 0.56);
 }
 .has-error {
     border: 1px solid red;
