@@ -131,9 +131,22 @@ myApp.controller('applicationController', ['$scope', '$http', '$interval', '$loc
 
 myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
 
-   
+   $scope.chatMessage = [];
 
-   console.log('test');
+   UsersService.get('chat')
+       .then(function (data, status, headers, config) {
+          $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
+         // $scope.loading = false;
+          console.log($scope.chatMessage);
+       })
+       ,function (error) {
+      console.log(error);
+
+   };
+
+
+
+
     /*//login permission check in current controller
     Auth.setUser({user:'test'});
     $scope.$watch(Auth.isLoggedIn, function (value, oldValue) {
@@ -153,19 +166,12 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
 
 }]);
 myApp.controller('defaultCtrl', ['$rootScope','$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($rootScope, $scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
-//route change event - check if user have permission
-
-
-
-
     $scope.isLoggin = true;
-    //show login or logout button
-    //(!Auth.isLoggedIn()) ? $scope.isLoggin = false :   $scope.isLoggin = true ;
-    //logOut function
     $scope.logOut = function () {
         Auth.logOut();
         $window.location.href = '/home';
-    }
+    };
+    //listening route change and display login button or lofOut
     $rootScope.$on('$routeChangeStart', function (event) {
         (!Auth.isLoggedIn()) ? $scope.isLoggin = false :   $scope.isLoggin = true ;
     });
@@ -706,24 +712,3 @@ myApp.controller('saleController', ['$scope', '$interval', '$location', function
 /**
  * Created by User on 11/11/2016.
  */
-
-
-myApp.directive('activeLink', ['$location', function (location) {
-    //create menu active links
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-            var clazz = attrs.activeLink;
-            var path = attrs.href;
-            scope.location = location;
-            scope.$watch('location.path()', function (newPath) {
-                if (path === newPath) {
-                    element.addClass(clazz);
-                } else {
-                    element.removeClass(clazz);
-                }
-            });
-        }
-    };
-}]);
-
