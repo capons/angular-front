@@ -2,11 +2,12 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
 
    $scope.chatMessage = [];
 
+
+
    UsersService.get('chat')
        .then(function (data, status, headers, config) {
-          $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
-         // $scope.loading = false;
-          console.log($scope.chatMessage);
+           $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
+           chatScollBottom($scope);
        })
        ,function (error) {
       console.log(error);
@@ -35,6 +36,8 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
                 if(data.status) {
                     //if error do not exist add object to dom
                     $scope.chatMessage.push(data.data.body);
+                    //chat scroll to the bottom
+                    chatScollBottom($scope);
                 }
         })
             ,function (error) {
@@ -43,15 +46,21 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
         };
     };
 
-
-
     $scope.selectUser = function (id) {
         console.log(id);
     };
 
-
-
-
-    
-
+    //add chat scroll to bottom
+    var chatScollBottom = function ($scope) {
+        if($scope.chatMessage) {
+            var chatMessageCount = $scope.chatMessage.length;
+            var chatMainBox = document.getElementById("over");
+            var chatMessageBox =  $(".chatMessageBody");
+            var chatWindowHeight = (50*chatMessageCount)+50;
+            //add height to chat main window
+            chatMessageBox.css("height", chatWindowHeight);
+            //chat scroll to bottom
+            chatMainBox.scrollTop = chatWindowHeight;
+        }
+    };
 }]);
