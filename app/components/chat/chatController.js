@@ -14,23 +14,44 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
    };
 
 
-
-
-    /*//login permission check in current controller
-    Auth.setUser({user:'test'});
-    $scope.$watch(Auth.isLoggedIn, function (value, oldValue) {
-        console.log(oldValue);
-        if(!value && !oldValue) {
-            console.log("Disconnect");
-            $location.path('/login');
+    $scope.submitPublicMessage = function (message) {
+        // If form is invalid, return and let AngularJS show validation errors.
+        if (message.$invalid) {
+            //enable form button
+            $scope.formButton = false;
+            return;
         }
+        
+        var data = {
+            message: $scope.publicMessage.message
+        };
+        var config = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+        };
+        UsersService.post('chat/message', JSON.stringify(data), config)
+            .then(function (data, status, headers, config) {
+                if(data.status) {
+                    //if error do not exist add object to dom
+                    $scope.chatMessage.push(data.data.body);
+                }
+        })
+            ,function (error) {
+            console.log(error);
 
-        if(value) {
-            console.log("Connect");
-            //Do something when the user is connected
-        }
+        };
+    };
 
-    }, true);
-    */
+
+
+    $scope.selectUser = function (id) {
+        console.log(id);
+    };
+
+
+
+
+    
 
 }]);
