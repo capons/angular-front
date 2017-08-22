@@ -29,9 +29,14 @@
 
             </div>
             <div style="min-height: 500px;padding: 0px;background-color: cornflowerblue" class="col-lg-4">
-                <div style="background-color: #009999;border: solid 1px goldenrod;min-height: 50px" class="col-lg-12">
-                   тут появляется ник кому пишем
+                <!-- Online user list-->
+                <div  style="background-color: #009999;position: relative;padding: 0px;border: solid 1px goldenrod;border-right:none;min-height: 50px" ng-repeat="userIn in onlineUsers" class="col-lg-12">
+                    {{userIn.id}}
+                    <img data-user-in="{{userIn.id}}"  class="img-thumbnail" style="max-width: 50px;max-height: 50px" src="{{userIn.image.path}}">
                 </div>
+
+
+
                 <form name="publicMessageForm" novalidate role="form">
                     <div class="form-group">
                         <!--form validation submit flag "submitted" -->

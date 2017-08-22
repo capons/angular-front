@@ -11,8 +11,9 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
         return $http({
             "url": apiUrl+url,//'users'
             "method": 'GET',
+            "params":  params
 
-            headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
+        //  headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
             //  "cache": true
         });
     };

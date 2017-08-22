@@ -50,8 +50,9 @@ myApp.service('UsersService',['$http', 'apiUrl', function ($http, apiUrl) {
         return $http({
             "url": apiUrl+url,//'users'
             "method": 'GET',
+            "params":  params
 
-            headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
+        //  headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
             //  "cache": true
         });
     };
@@ -132,17 +133,18 @@ myApp.controller('applicationController', ['$scope', '$http', '$interval', '$loc
 myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
 
    $scope.chatMessage = [];
+   $scope.onlineUsers = [];
 
 
 
    UsersService.get('chat')
        .then(function (data, status, headers, config) {
-           $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
-           chatScollBottom($scope);
+           if(data.status == 200) {
+               $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
+               chatScollBottom($scope);
+           }
        })
        ,function (error) {
-      console.log(error);
-
    };
 
 
@@ -194,6 +196,74 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             chatMainBox.scrollTop = chatWindowHeight;
         }
     };
+    
+    
+    
+    
+    
+    //need to add service for this
+    //run function to update current user online status + return all online user
+    runOnlineUsers();
+
+    var firstTime = false;
+    function runOnlineUsers() {
+        if(firstTime == true) {
+            //every 60 seconf update user online status
+            $interval(updateUserOnlineStatus, 60000);
+        } else {
+            firstTime = true;
+            //execute function to update user online status + get all online user
+            updateUserOnlineStatus();
+            //recursive function call
+            runOnlineUsers();
+        }
+    }
+
+    function updateUserOnlineStatus() {
+        var userParam = JSON.parse(Auth.isLoggedIn());
+        if(userParam) {
+            var data = {
+                currentUser: userParam[0].id
+            };
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+            UsersService.post('online/update', JSON.stringify(data), config)
+                .then(function (data, status, headers, config) {
+                    if (data.status == 200) {
+                        getOnlineUser();
+                    }
+                })
+                , function (error) {
+            };
+        }
+    }
+
+    function getOnlineUser() {
+        var userParam = JSON.parse(Auth.isLoggedIn());
+        if(userParam) {
+            var data = {
+                currentUser: userParam[0].id
+            };
+            var config = {
+                headers: {
+                //    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+            UsersService.get('online/user', data, config)
+                .then(function (data, status, headers, config) {
+                    if (data.status !== 404) {
+                        $scope.onlineUsers = data.data.body;
+                    } else {
+                        $scope.onlineUsers = [];
+                    }
+                })
+                , function (error) {
+            };
+        }
+    }
 }]);
 
 myApp.controller('defaultCtrl', ['$rootScope','$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($rootScope, $scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
@@ -218,7 +288,10 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     UsersService.get('users')
         .then(function (data, status, headers, config) {
-            $scope.users = data.data.body;//angular.fromJson(responseData);
+            console.log(data);
+            if(data.data.body.length > 0) {
+                $scope.users = data.data.body;//angular.fromJson(responseData);
+            }
             $scope.loading = false;
         })
         ,function (error) {
@@ -298,6 +371,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     //send registration form with file and show upload bar
     function uploadBar($scope) { //file, user
+        //for if need upload multiple files
       //  for (var i in file) {
             var form = new FormData();
             var xhr = new XMLHttpRequest;
@@ -307,6 +381,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             form.append('email', $scope.user.email);
             form.append('country', $scope.user.country);
             form.append('address',$scope.user.address);
+
 
             $scope.uploadProgressBar = true;
             xhr.upload.onprogress = function(e) {
@@ -364,6 +439,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                 }
             };
             xhr.open('POST', apiUrl+'users', true);
+          //  xhr.setRequestHeader('Content-Type', 'multipart/form-data');
             xhr.send(form);
       //  }
     }
@@ -703,13 +779,14 @@ myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'User
             UsersService.post('login', param, config)
                 .then(function (data) {
                     //return data from API
-                    if(data.status) {
+                    console.log(data);
+                    if(data.status !== false) {
                         var user = [data.data.body];
                         Auth.setUser(user);
                         $scope.formButton = false;
                         $window.location.href = '/chat';
                     } else {
-                        console.log(data.error);
+                        console.log('not ok');
                     }
                 })
                 ,function (error) {

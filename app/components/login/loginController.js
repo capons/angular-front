@@ -22,13 +22,14 @@ myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'User
             UsersService.post('login', param, config)
                 .then(function (data) {
                     //return data from API
-                    if(data.status) {
+                    console.log(data);
+                    if(data.status !== false) {
                         var user = [data.data.body];
                         Auth.setUser(user);
                         $scope.formButton = false;
                         $window.location.href = '/chat';
                     } else {
-                        console.log(data.error);
+                        console.log('not ok');
                     }
                 })
                 ,function (error) {

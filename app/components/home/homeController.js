@@ -8,7 +8,10 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     UsersService.get('users')
         .then(function (data, status, headers, config) {
-            $scope.users = data.data.body;//angular.fromJson(responseData);
+            console.log(data);
+            if(data.data.body.length > 0) {
+                $scope.users = data.data.body;//angular.fromJson(responseData);
+            }
             $scope.loading = false;
         })
         ,function (error) {
@@ -88,6 +91,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
 
     //send registration form with file and show upload bar
     function uploadBar($scope) { //file, user
+        //for if need upload multiple files
       //  for (var i in file) {
             var form = new FormData();
             var xhr = new XMLHttpRequest;
@@ -97,6 +101,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
             form.append('email', $scope.user.email);
             form.append('country', $scope.user.country);
             form.append('address',$scope.user.address);
+
 
             $scope.uploadProgressBar = true;
             xhr.upload.onprogress = function(e) {
@@ -154,6 +159,7 @@ myApp.controller('homeController', ['$scope', '$http', '$interval', '$location',
                 }
             };
             xhr.open('POST', apiUrl+'users', true);
+          //  xhr.setRequestHeader('Content-Type', 'multipart/form-data');
             xhr.send(form);
       //  }
     }

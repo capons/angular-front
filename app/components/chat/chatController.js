@@ -1,17 +1,18 @@
 myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
 
    $scope.chatMessage = [];
+   $scope.onlineUsers = [];
 
 
 
    UsersService.get('chat')
        .then(function (data, status, headers, config) {
-           $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
-           chatScollBottom($scope);
+           if(data.status == 200) {
+               $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
+               chatScollBottom($scope);
+           }
        })
        ,function (error) {
-      console.log(error);
-
    };
 
 
@@ -63,4 +64,72 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             chatMainBox.scrollTop = chatWindowHeight;
         }
     };
+    
+    
+    
+    
+    
+    //need to add service for this
+    //run function to update current user online status + return all online user
+    runOnlineUsers();
+
+    var firstTime = false;
+    function runOnlineUsers() {
+        if(firstTime == true) {
+            //every 60 seconf update user online status
+            $interval(updateUserOnlineStatus, 60000);
+        } else {
+            firstTime = true;
+            //execute function to update user online status + get all online user
+            updateUserOnlineStatus();
+            //recursive function call
+            runOnlineUsers();
+        }
+    }
+
+    function updateUserOnlineStatus() {
+        var userParam = JSON.parse(Auth.isLoggedIn());
+        if(userParam) {
+            var data = {
+                currentUser: userParam[0].id
+            };
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+            UsersService.post('online/update', JSON.stringify(data), config)
+                .then(function (data, status, headers, config) {
+                    if (data.status == 200) {
+                        getOnlineUser();
+                    }
+                })
+                , function (error) {
+            };
+        }
+    }
+
+    function getOnlineUser() {
+        var userParam = JSON.parse(Auth.isLoggedIn());
+        if(userParam) {
+            var data = {
+                currentUser: userParam[0].id
+            };
+            var config = {
+                headers: {
+                //    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+            UsersService.get('online/user', data, config)
+                .then(function (data, status, headers, config) {
+                    if (data.status !== 404) {
+                        $scope.onlineUsers = data.data.body;
+                    } else {
+                        $scope.onlineUsers = [];
+                    }
+                })
+                , function (error) {
+            };
+        }
+    }
 }]);
