@@ -1,19 +1,7 @@
-myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
+myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', 'chatService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth, chatService) {
 
-   $scope.chatMessage = [];
-   $scope.onlineUsers = [];
-
-
-
-   UsersService.get('chat')
-       .then(function (data, status, headers, config) {
-           if(data.status == 200) {
-               $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
-               chatScollBottom($scope);
-           }
-       })
-       ,function (error) {
-   };
+    $scope.chatMessage = [];
+    $scope.onlineUsers = [];
 
 
     $scope.submitPublicMessage = function (message) {
@@ -50,7 +38,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
     $scope.selectUser = function (id) {
         console.log(id);
     };
-
+    /*
     //add chat scroll to bottom
     var chatScollBottom = function ($scope) {
         if($scope.chatMessage) {
@@ -64,28 +52,61 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             chatMainBox.scrollTop = chatWindowHeight;
         }
     };
+    */
     
-    
-    
-    
-    
+
     //need to add service for this
     //run function to update current user online status + return all online user
-    runOnlineUsers();
+    //runChat();
 
+    chatService.updateChatMessage($scope);
+    chatService.updateUserOnlineStatus($scope);
+
+
+
+    /*
     var firstTime = false;
-    function runOnlineUsers() {
+    function runChat() {
         if(firstTime == true) {
             //every 60 seconf update user online status
             $interval(updateUserOnlineStatus, 60000);
+           // $interval(updateChatMessage, 2000);
+
         } else {
             firstTime = true;
             //execute function to update user online status + get all online user
             updateUserOnlineStatus();
+            //update chat message
+
+            //updateChatMessage();
+          //  chatService.updateChatMessage($scope);
+
+
+
             //recursive function call
-            runOnlineUsers();
+            runChat();
         }
+    }*/
+
+
+
+
+
+    /*
+
+    function updateChatMessage() {
+        UsersService.get('chat')
+            .then(function (data, status, headers, config) {
+                if(data.status == 200) {
+                    $scope.chatMessage = data.data.body;
+                    chatScollBottom($scope);
+                }
+            })
+            ,function (error) {
+        };
     }
+
+
 
     function updateUserOnlineStatus() {
         var userParam = JSON.parse(Auth.isLoggedIn());
@@ -101,6 +122,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             UsersService.post('online/update', JSON.stringify(data), config)
                 .then(function (data, status, headers, config) {
                     if (data.status == 200) {
+                      //  getOnlineUser();
                         getOnlineUser();
                     }
                 })
@@ -108,6 +130,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             };
         }
     }
+
 
     function getOnlineUser() {
         var userParam = JSON.parse(Auth.isLoggedIn());
@@ -132,4 +155,6 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             };
         }
     }
+    */
+
 }]);

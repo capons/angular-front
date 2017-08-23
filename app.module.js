@@ -130,22 +130,10 @@ myApp.controller('applicationController', ['$scope', '$http', '$interval', '$loc
 }]);
 
 
-myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
+myApp.controller('chatController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', 'chatService', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth, chatService) {
 
-   $scope.chatMessage = [];
-   $scope.onlineUsers = [];
-
-
-
-   UsersService.get('chat')
-       .then(function (data, status, headers, config) {
-           if(data.status == 200) {
-               $scope.chatMessage = data.data.body;//angular.fromJson(responseData);
-               chatScollBottom($scope);
-           }
-       })
-       ,function (error) {
-   };
+    $scope.chatMessage = [];
+    $scope.onlineUsers = [];
 
 
     $scope.submitPublicMessage = function (message) {
@@ -182,7 +170,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
     $scope.selectUser = function (id) {
         console.log(id);
     };
-
+    /*
     //add chat scroll to bottom
     var chatScollBottom = function ($scope) {
         if($scope.chatMessage) {
@@ -196,28 +184,61 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             chatMainBox.scrollTop = chatWindowHeight;
         }
     };
+    */
     
-    
-    
-    
-    
+
     //need to add service for this
     //run function to update current user online status + return all online user
-    runOnlineUsers();
+    //runChat();
 
+    chatService.updateChatMessage($scope);
+    chatService.updateUserOnlineStatus($scope);
+
+
+
+    /*
     var firstTime = false;
-    function runOnlineUsers() {
+    function runChat() {
         if(firstTime == true) {
             //every 60 seconf update user online status
             $interval(updateUserOnlineStatus, 60000);
+           // $interval(updateChatMessage, 2000);
+
         } else {
             firstTime = true;
             //execute function to update user online status + get all online user
             updateUserOnlineStatus();
+            //update chat message
+
+            //updateChatMessage();
+          //  chatService.updateChatMessage($scope);
+
+
+
             //recursive function call
-            runOnlineUsers();
+            runChat();
         }
+    }*/
+
+
+
+
+
+    /*
+
+    function updateChatMessage() {
+        UsersService.get('chat')
+            .then(function (data, status, headers, config) {
+                if(data.status == 200) {
+                    $scope.chatMessage = data.data.body;
+                    chatScollBottom($scope);
+                }
+            })
+            ,function (error) {
+        };
     }
+
+
 
     function updateUserOnlineStatus() {
         var userParam = JSON.parse(Auth.isLoggedIn());
@@ -233,6 +254,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             UsersService.post('online/update', JSON.stringify(data), config)
                 .then(function (data, status, headers, config) {
                     if (data.status == 200) {
+                      //  getOnlineUser();
                         getOnlineUser();
                     }
                 })
@@ -240,6 +262,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             };
         }
     }
+
 
     function getOnlineUser() {
         var userParam = JSON.parse(Auth.isLoggedIn());
@@ -264,8 +287,122 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             };
         }
     }
+    */
+
 }]);
 
+myApp.service('chatService',['$http', '$interval', 'apiUrl', 'UsersService', 'Auth',function ($http, $interval, apiUrl, UsersService, Auth) {
+    this.updateUserOnlineStatus = function ($scope) {
+        //get online users
+        function getOnlineUser() {
+            var userParam = JSON.parse(Auth.isLoggedIn());
+            if(userParam) {
+                var data = {
+                    currentUser: userParam[0].id
+                };
+                var config = {
+                    headers: {
+                        //    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                    }
+                };
+                UsersService.get('online/user', data, config)
+                    .then(function (data, status, headers, config) {
+                        if (data.status !== 404) {
+                            $scope.onlineUsers = data.data.body;
+                        } else {
+                            $scope.onlineUsers = [];
+                        }
+                    })
+                    , function (error) {
+                };
+            }
+        }
+        //update current user online status
+        function updateUserOnlineStatus() {
+            var userParam = JSON.parse(Auth.isLoggedIn());
+            if(userParam) {
+                var data = {
+                    currentUser: userParam[0].id
+                };
+                var config = {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                    }
+                };
+                UsersService.post('online/update', JSON.stringify(data), config)
+                    .then(function (data, status, headers, config) {
+                        if (data.status == 200) {
+                            //update current user online status
+                            getOnlineUser($scope)
+                        }
+                    })
+                    , function (error) {
+                };
+            }
+        }
+
+
+        var firstTime = false;
+        function execute() {
+            if(firstTime == true) {
+                //every 60 second update current user online stats
+                $interval(updateUserOnlineStatus, 60000);
+
+            } else {
+                firstTime = true;
+                updateUserOnlineStatus();
+                //recursive function call
+                execute();
+            }
+        }
+
+        return execute()
+    };
+    
+    this.updateChatMessage = function ($scope) {
+        function chatScollBottom() {
+            if($scope.chatMessage) {
+                var chatMessageCount = $scope.chatMessage.length;
+                var chatMainBox = document.getElementById("over");
+                var chatMessageBox =  $(".chatMessageBody");
+                var chatWindowHeight = (50*chatMessageCount)+50;
+                //add height to chat main window
+                chatMessageBox.css("height", chatWindowHeight);
+                //chat scroll to bottom
+                chatMainBox.scrollTop = chatWindowHeight;
+            }
+        }
+        
+        function updateChatMessage() {
+            UsersService.get('chat')
+                .then(function (data, status, headers, config) {
+                    if(data.status == 200) {
+                        $scope.chatMessage = data.data.body;
+                        chatScollBottom();
+                    }
+                })
+                ,function (error) {
+            };
+        }
+
+        var firstTime = false;
+        function execute() {
+            if(firstTime == true) {
+                //every 2 second update chat message
+                 $interval(updateChatMessage, 2000);
+
+            } else {
+                firstTime = true;
+                updateChatMessage();
+                //recursive function call
+                execute();
+            }
+        }
+        
+        return execute()
+    };
+
+}]);
 myApp.controller('defaultCtrl', ['$rootScope','$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService', 'Auth', function ($rootScope, $scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService, Auth) {
     $scope.isLoggin = true;
     $scope.logOut = function () {
