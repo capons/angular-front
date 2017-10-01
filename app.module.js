@@ -134,8 +134,7 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
 
     $scope.chatMessage = [];
     $scope.onlineUsers = [];
-
-
+    
     $scope.submitPublicMessage = function (message) {
         // If form is invalid, return and let AngularJS show validation errors.
         if (message.$invalid) {
@@ -143,7 +142,6 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             $scope.formButton = false;
             return;
         }
-        
         var data = {
             message: $scope.publicMessage.message
         };
