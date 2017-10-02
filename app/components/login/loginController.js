@@ -25,6 +25,7 @@ myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'User
                     console.log(data);
                     if(data.status !== false) {
                         var user = [data.data.body];
+                        //add login user parameter to auth session
                         Auth.setUser(user);
                         $scope.formButton = false;
                         $window.location.href = '/chat';

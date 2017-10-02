@@ -42,6 +42,9 @@ myApp.factory('Auth',['$window', function($window){
             $window.localStorage.setItem(key,JSON.stringify(user));
            // user = aUser;
         },
+        getUser : function () {
+           return  angular.fromJson($window.localStorage.getItem(key));
+        },
         isLoggedIn : function(){
            // return(user)? user : false;
             var loginParam = $window.localStorage.getItem(key);
@@ -52,4 +55,4 @@ myApp.factory('Auth',['$window', function($window){
             $window.localStorage.removeItem(key)
         }
     }
-}]);;
+}]);
