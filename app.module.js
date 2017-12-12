@@ -156,24 +156,22 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
         UsersService.post('chat/message', JSON.stringify(data), config)
             .then(function (data, status, headers, config) {
                 if(data.status) {
+                    //clear input
+                    $scope.publicMessage.message = null;
                     //if error do not exist add object to dom
-                    $scope.chatMessage.push(data.data.body);
+                    //do not update chat with my message, global chat update loop will do it
+                   // $scope.chatMessage.push(data.data.body);
                     //chat scroll to the bottom
                     chatScollBottom($scope);
                 }
         })
             ,function (error) {
-            console.log(error);
+           // console.log(error);
 
         };
     };
 
-    $scope.selectUser = function (id) {
-        console.log(id);
-    };
-    /*
-    //add chat scroll to bottom
-    var chatScollBottom = function ($scope) {
+    var chatScollBottom = function () {
         if($scope.chatMessage) {
             var chatMessageCount = $scope.chatMessage.length;
             var chatMainBox = document.getElementById("over");
@@ -184,115 +182,20 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             //chat scroll to bottom
             chatMainBox.scrollTop = chatWindowHeight;
         }
-    };
-    */
-    
+    }
 
-    //need to add service for this
-    //run function to update current user online status + return all online user
-    //runChat();
+    $scope.selectUser = function (id) {
+        //console.log(id);
+    };
+
 
     chatService.updateChatMessage($scope);
     chatService.updateUserOnlineStatus($scope);
 
 
-
-    /*
-    var firstTime = false;
-    function runChat() {
-        if(firstTime == true) {
-            //every 60 seconf update user online status
-            $interval(updateUserOnlineStatus, 60000);
-           // $interval(updateChatMessage, 2000);
-
-        } else {
-            firstTime = true;
-            //execute function to update user online status + get all online user
-            updateUserOnlineStatus();
-            //update chat message
-
-            //updateChatMessage();
-          //  chatService.updateChatMessage($scope);
-
-
-
-            //recursive function call
-            runChat();
-        }
-    }*/
-
-
-
-
-
-    /*
-
-    function updateChatMessage() {
-        UsersService.get('chat')
-            .then(function (data, status, headers, config) {
-                if(data.status == 200) {
-                    $scope.chatMessage = data.data.body;
-                    chatScollBottom($scope);
-                }
-            })
-            ,function (error) {
-        };
-    }
-
-
-
-    function updateUserOnlineStatus() {
-        var userParam = JSON.parse(Auth.isLoggedIn());
-        if(userParam) {
-            var data = {
-                currentUser: userParam[0].id
-            };
-            var config = {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-            UsersService.post('online/update', JSON.stringify(data), config)
-                .then(function (data, status, headers, config) {
-                    if (data.status == 200) {
-                      //  getOnlineUser();
-                        getOnlineUser();
-                    }
-                })
-                , function (error) {
-            };
-        }
-    }
-
-
-    function getOnlineUser() {
-        var userParam = JSON.parse(Auth.isLoggedIn());
-        if(userParam) {
-            var data = {
-                currentUser: userParam[0].id
-            };
-            var config = {
-                headers: {
-                //    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-            UsersService.get('online/user', data, config)
-                .then(function (data, status, headers, config) {
-                    if (data.status !== 404) {
-                        $scope.onlineUsers = data.data.body;
-                    } else {
-                        $scope.onlineUsers = [];
-                    }
-                })
-                , function (error) {
-            };
-        }
-    }
-    */
-
 }]);
 
-myApp.service('chatService',['$http', '$interval', 'apiUrl', 'UsersService', 'Auth',function ($http, $interval, apiUrl, UsersService, Auth) {
+myApp.service('chatService',['$http', '$interval', 'apiUrl', '$timeout', 'UsersService', 'Auth',function ($http, $interval, apiUrl, $timeout, UsersService, Auth) {
     this.updateUserOnlineStatus = function ($scope) {
         //get online users
         function getOnlineUser() {
@@ -373,31 +276,46 @@ myApp.service('chatService',['$http', '$interval', 'apiUrl', 'UsersService', 'Au
                 chatMainBox.scrollTop = chatWindowHeight;
             }
         }
-        
-        function updateChatMessage() {
-            UsersService.get('chat')
+
+        var existIds = [];
+        var  updateChatMessage = function(firstTime) {
+            var param = '';
+            if(existIds.length > 0) {
+               // console.log('request param ' + existIds);
+                var param = {'existIds[]':  existIds}
+            }
+            UsersService.get('chat', param)
                 .then(function (data, status, headers, config) {
                     if(data.status == 200) {
-                        $scope.chatMessage = data.data.body;
+                        
+                            //var promise = $timeout();
+                           // fruits.reverse();
+                             angular.forEach(data.data.body, function (value, key) {
+                                 //console.log(value.id);
+                                 existIds.push(value.id);
+                                 $scope.chatMessage.push(value); //unshift
+                             //    console.log(value.id);
+                                /*
+                                 promise = promise.then(function () {
+                                     $scope.chatMessage.push(value); //unshift
+                                     return $timeout(500);
+                                 });
+                                 */
+                             });
+                        
                         chatScollBottom();
                     }
                 })
                 ,function (error) {
             };
-        }
+        };
 
-        var firstTime = false;
         function execute() {
-            if(firstTime == true) {
-                //every 2 second update chat message
-                 $interval(updateChatMessage, 2000);
+            //run at first time
+            updateChatMessage(true);
+            //loop in second time
+            $interval( function(){ updateChatMessage(false) }, 5000);
 
-            } else {
-                firstTime = true;
-                updateChatMessage();
-                //recursive function call
-                execute();
-            }
         }
         
         return execute()
@@ -444,64 +362,6 @@ myApp.controller('defaultCtrl', ['$rootScope','$scope', '$http', '$interval', '$
     }
 }]);
 
-myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'UsersService', 'apiUrl', function ($window, $scope, $http, Auth, UsersService, apiUrl) {
-    //submit login form
-    $scope.submit = function(login) {
-        //disable form button
-        $scope.formButton = true;
-        // Trigger validation flag.
-        //flag to display error message
-        // If form is invalid, return and let AngularJS show validation errors.
-        if (login.$invalid) {
-            //enable form button
-            $scope.formButton = false;
-            return;
-        }
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-            }
-        };
-        var param = $.param({email: $scope.customer.email, password: $scope.customer.pass});
-        //user param
-        //uploadBar($scope); //$scope.files, $scope.user
-            UsersService.post('login', param, config)
-                .then(function (data) {
-                    //return data from API
-                    console.log(data);
-                    if(data.status !== false) {
-                        var user = [data.data.body];
-                        //add login user parameter to auth session
-                        Auth.setUser(user);
-                        $scope.formButton = false;
-                        $window.location.href = '/chat';
-                    } else {
-                        console.log('not ok');
-                    }
-                })
-                ,function (error) {
-                      console.log(error);
-                //  console.log(status);
-                //  console.log(header);
-                //  console.log(config);
-            };
-    };
-    
-    
-    
-    
-    
-    
-    
-    console.log('login controller');
-    $scope.login = function () {
-        // Ask to the server, do your job and THEN set the user
-        var user = [user = ['user data']];
-        Auth.setUser(user); //Update the state of the user in the app
-    };
-      
-    
-}]);
 
 
 myApp.controller('homeController', ['$scope', '$http', '$interval', '$location', 'apiUrl', '$timeout', '$window', 'UserData','UsersService','$timeout', function ($scope, $http, $interval, $location, apiUrl, $timeout, $window, UserData, UsersService) {
@@ -979,6 +839,64 @@ myApp.filter('startFrom', function() {
     }
 });
 
+myApp.controller('loginController', ['$window','$scope', '$http', 'Auth',  'UsersService', 'apiUrl', function ($window, $scope, $http, Auth, UsersService, apiUrl) {
+    //submit login form
+    $scope.submit = function(login) {
+        //disable form button
+        $scope.formButton = true;
+        // Trigger validation flag.
+        //flag to display error message
+        // If form is invalid, return and let AngularJS show validation errors.
+        if (login.$invalid) {
+            //enable form button
+            $scope.formButton = false;
+            return;
+        }
+        var config = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        var param = $.param({email: $scope.customer.email, password: $scope.customer.pass});
+        //user param
+        //uploadBar($scope); //$scope.files, $scope.user
+            UsersService.post('login', param, config)
+                .then(function (data) {
+                    //return data from API
+                    console.log(data);
+                    if(data.status !== false) {
+                        var user = [data.data.body];
+                        //add login user parameter to auth session
+                        Auth.setUser(user);
+                        $scope.formButton = false;
+                        $window.location.href = '/chat';
+                    } else {
+                        console.log('not ok');
+                    }
+                })
+                ,function (error) {
+                      console.log(error);
+                //  console.log(status);
+                //  console.log(header);
+                //  console.log(config);
+            };
+    };
+    
+    
+    
+    
+    
+    
+    
+    console.log('login controller');
+    $scope.login = function () {
+        // Ask to the server, do your job and THEN set the user
+        var user = [user = ['user data']];
+        Auth.setUser(user); //Update the state of the user in the app
+    };
+      
+    
+}]);
 
 
 myApp.controller('saleController', ['$scope', '$interval', '$location', function ($scope, $interval, $location) {

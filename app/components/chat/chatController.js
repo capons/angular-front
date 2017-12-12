@@ -21,24 +21,22 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
         UsersService.post('chat/message', JSON.stringify(data), config)
             .then(function (data, status, headers, config) {
                 if(data.status) {
+                    //clear input
+                    $scope.publicMessage.message = null;
                     //if error do not exist add object to dom
-                    $scope.chatMessage.push(data.data.body);
+                    //do not update chat with my message, global chat update loop will do it
+                   // $scope.chatMessage.push(data.data.body);
                     //chat scroll to the bottom
                     chatScollBottom($scope);
                 }
         })
             ,function (error) {
-            console.log(error);
+           // console.log(error);
 
         };
     };
 
-    $scope.selectUser = function (id) {
-        console.log(id);
-    };
-    /*
-    //add chat scroll to bottom
-    var chatScollBottom = function ($scope) {
+    var chatScollBottom = function () {
         if($scope.chatMessage) {
             var chatMessageCount = $scope.chatMessage.length;
             var chatMainBox = document.getElementById("over");
@@ -49,110 +47,15 @@ myApp.controller('chatController', ['$scope', '$http', '$interval', '$location',
             //chat scroll to bottom
             chatMainBox.scrollTop = chatWindowHeight;
         }
-    };
-    */
-    
+    }
 
-    //need to add service for this
-    //run function to update current user online status + return all online user
-    //runChat();
+    $scope.selectUser = function (id) {
+        //console.log(id);
+    };
+
 
     chatService.updateChatMessage($scope);
     chatService.updateUserOnlineStatus($scope);
 
-
-
-    /*
-    var firstTime = false;
-    function runChat() {
-        if(firstTime == true) {
-            //every 60 seconf update user online status
-            $interval(updateUserOnlineStatus, 60000);
-           // $interval(updateChatMessage, 2000);
-
-        } else {
-            firstTime = true;
-            //execute function to update user online status + get all online user
-            updateUserOnlineStatus();
-            //update chat message
-
-            //updateChatMessage();
-          //  chatService.updateChatMessage($scope);
-
-
-
-            //recursive function call
-            runChat();
-        }
-    }*/
-
-
-
-
-
-    /*
-
-    function updateChatMessage() {
-        UsersService.get('chat')
-            .then(function (data, status, headers, config) {
-                if(data.status == 200) {
-                    $scope.chatMessage = data.data.body;
-                    chatScollBottom($scope);
-                }
-            })
-            ,function (error) {
-        };
-    }
-
-
-
-    function updateUserOnlineStatus() {
-        var userParam = JSON.parse(Auth.isLoggedIn());
-        if(userParam) {
-            var data = {
-                currentUser: userParam[0].id
-            };
-            var config = {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-            UsersService.post('online/update', JSON.stringify(data), config)
-                .then(function (data, status, headers, config) {
-                    if (data.status == 200) {
-                      //  getOnlineUser();
-                        getOnlineUser();
-                    }
-                })
-                , function (error) {
-            };
-        }
-    }
-
-
-    function getOnlineUser() {
-        var userParam = JSON.parse(Auth.isLoggedIn());
-        if(userParam) {
-            var data = {
-                currentUser: userParam[0].id
-            };
-            var config = {
-                headers: {
-                //    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-            UsersService.get('online/user', data, config)
-                .then(function (data, status, headers, config) {
-                    if (data.status !== 404) {
-                        $scope.onlineUsers = data.data.body;
-                    } else {
-                        $scope.onlineUsers = [];
-                    }
-                })
-                , function (error) {
-            };
-        }
-    }
-    */
 
 }]);

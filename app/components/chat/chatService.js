@@ -1,4 +1,4 @@
-myApp.service('chatService',['$http', '$interval', 'apiUrl', 'UsersService', 'Auth',function ($http, $interval, apiUrl, UsersService, Auth) {
+myApp.service('chatService',['$http', '$interval', 'apiUrl', '$timeout', 'UsersService', 'Auth',function ($http, $interval, apiUrl, $timeout, UsersService, Auth) {
     this.updateUserOnlineStatus = function ($scope) {
         //get online users
         function getOnlineUser() {
@@ -79,31 +79,46 @@ myApp.service('chatService',['$http', '$interval', 'apiUrl', 'UsersService', 'Au
                 chatMainBox.scrollTop = chatWindowHeight;
             }
         }
-        
-        function updateChatMessage() {
-            UsersService.get('chat')
+
+        var existIds = [];
+        var  updateChatMessage = function(firstTime) {
+            var param = '';
+            if(existIds.length > 0) {
+               // console.log('request param ' + existIds);
+                var param = {'existIds[]':  existIds}
+            }
+            UsersService.get('chat', param)
                 .then(function (data, status, headers, config) {
                     if(data.status == 200) {
-                        $scope.chatMessage = data.data.body;
+                        
+                            //var promise = $timeout();
+                           // fruits.reverse();
+                             angular.forEach(data.data.body, function (value, key) {
+                                 //console.log(value.id);
+                                 existIds.push(value.id);
+                                 $scope.chatMessage.push(value); //unshift
+                             //    console.log(value.id);
+                                /*
+                                 promise = promise.then(function () {
+                                     $scope.chatMessage.push(value); //unshift
+                                     return $timeout(500);
+                                 });
+                                 */
+                             });
+                        
                         chatScollBottom();
                     }
                 })
                 ,function (error) {
             };
-        }
+        };
 
-        var firstTime = false;
         function execute() {
-            if(firstTime == true) {
-                //every 2 second update chat message
-                 $interval(updateChatMessage, 2000);
+            //run at first time
+            updateChatMessage(true);
+            //loop in second time
+            $interval( function(){ updateChatMessage(false) }, 5000);
 
-            } else {
-                firstTime = true;
-                updateChatMessage();
-                //recursive function call
-                execute();
-            }
         }
         
         return execute()
